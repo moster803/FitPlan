@@ -126,11 +126,10 @@ jobs:
         if: always()
         run: |
           # Verkleinerte Screenshots als Base64 ins Log, damit sie auch ohne Artefakt-Download prüfbar sind.
-          find app/build/outputs/connected_android_test_additional_output device-screenshots -name '*.png' 2>/dev/null | sort -u -t/ -k1 | while read -r f; do
-            name=$(basename "$f" .png)
-            convert "$f" -resize 360x -quality 70 "/tmp/$name.jpg" || continue
+          find device-screenshots -name '*.jpg' 2>/dev/null | sort | while read -r f; do
+            name=$(basename "$f" .jpg)
             echo "SHOT-BEGIN $name"
-            base64 -w 4000 "/tmp/$name.jpg" | sed 's/^/SHOT /'
+            base64 -w 4000 "$f" | sed 's/^/SHOT /'
             echo "SHOT-END $name"
           done
 

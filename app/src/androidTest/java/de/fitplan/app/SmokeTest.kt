@@ -55,10 +55,13 @@ class SmokeTest {
         dir.apply { mkdirs() }
     }
 
+    /** Speichert eine verkleinerte JPEG-Aufnahme, klein genug für das CI-Log. */
     private fun screenshot(name: String) {
         compose.waitForIdle()
         val bitmap = compose.onAllNodes(isRoot()).onLast().captureToImage().asAndroidBitmap()
-        File(outputDir, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        val width = 432
+        val scaled = Bitmap.createScaledBitmap(bitmap, width, bitmap.height * width / bitmap.width, true)
+        File(outputDir, "$name.jpg").outputStream().use { scaled.compress(Bitmap.CompressFormat.JPEG, 72, it) }
     }
 
     private fun waitForText(text: String, substring: Boolean = false) {
@@ -82,6 +85,15 @@ class SmokeTest {
 
     @Test
     fun walkThroughApp() {
+        try {
+            walkThrough()
+        } catch (error: Throwable) {
+            runCatching { screenshot("99_fehler") }
+            throw error
+        }
+    }
+
+    private fun walkThrough() {
         // Einrichtung
         waitForText("Willkommen bei FitPlan")
         compose.onNodeWithText("Wie dürfen wir dich nennen? (optional)").performTextInput("Mo")
@@ -119,17 +131,14 @@ class SmokeTest {
         compose.onNodeWithText("Vitamin D3").performClick()
         screenshot("06_heute_supplement_abgehakt")
 
-        // Geführtes Training
+        // Geführtes Training. Die Phasen laufen in Echtzeit; ohne Vorbereitungszeit beginnt der
+        // Plan mit einer Wiederholungs-Übung, die auf „Erledigt“ wartet – das macht den Test unabhängig vom Tempo.
+        runBlocking { app.repository.updateSettings { it.copy(getReadySeconds = 0, voice = false, sound = false) } }
         scrollTo("Starten")
         compose.onNodeWithText("Starten").performClick()
-        waitForText("Mach dich bereit")
-        screenshot("07_player_bereit")
-        // Die Vorbereitung läuft in Echtzeit ab – nur überspringen, wenn sie noch läuft.
-        if (exists("Weiter")) compose.onNodeWithText("Weiter").performClick()
         waitForText("Erledigt")
         screenshot("08_player_uebung")
         compose.onNodeWithText("Erledigt").performClick()
-        waitForText("Pause")
         screenshot("09_player_pause")
         var guard = 0
         while (!exists("Geschafft!") && guard++ < 120) {
