@@ -55,7 +55,8 @@ class Notifications(private val context: Context) {
         return manager.areNotificationsEnabled()
     }
 
-    fun showWorkout(data: AppData, plan: WorkoutPlan, followUp: Boolean, streak: Int) {
+    /** Erinnerung an das Training von [plan] am Tag [date]. */
+    fun showWorkout(data: AppData, plan: WorkoutPlan, followUp: Boolean, streak: Int, date: LocalDate) {
         val minutes = data.estimatedMinutes(plan)
         val title = if (followUp) {
             context.getString(R.string.notif_workout_followup_title)
@@ -67,6 +68,7 @@ class Notifications(private val context: Context) {
             if (streak > 0) append(" · ").append(context.getString(R.string.notif_streak, streak))
         }
         val open = activityIntent(MainActivity.OPEN_PLAYER, plan.id, requestCode = plan.id.hashCode())
+        val kind = if (followUp) AlarmKind.WORKOUT_FOLLOW_UP else AlarmKind.WORKOUT
         val notification = NotificationCompat.Builder(context, CHANNEL_WORKOUT)
             .setSmallIcon(R.drawable.ic_stat_fitplan)
             .setColor(ContextCompat.getColor(context, R.color.brand))
@@ -78,10 +80,11 @@ class Notifications(private val context: Context) {
             .setContentIntent(open)
             .setAutoCancel(true)
             .addAction(0, context.getString(R.string.notif_action_start), open)
-            .addAction(0, context.getString(R.string.notif_action_snooze), broadcast(ReminderReceiver.ACTION_SNOOZE, AlarmKind.WORKOUT.name, plan.id))
-            .addAction(0, context.getString(R.string.notif_action_done), broadcast(ReminderReceiver.ACTION_WORKOUT_DONE, AlarmKind.WORKOUT.name, plan.id))
+            .addAction(0, context.getString(R.string.notif_action_snooze), broadcast(ReminderReceiver.ACTION_SNOOZE, kind.name, plan.id))
+            // Der Tag reist mit: „Schon erledigt“ am nächsten Morgen zählt für den Tag der Erinnerung.
+            .addAction(0, context.getString(R.string.notif_action_done), broadcast(ReminderReceiver.ACTION_WORKOUT_DONE, kind.name, plan.id, date.toEpochDay()))
             .build()
-        post(workoutId(plan.id), notification)
+        post(plan.id, WORKOUT_ID, notification)
     }
 
     fun showSupplements(slot: TimeSlot, supplements: List<Supplement>, date: LocalDate) {
@@ -107,7 +110,7 @@ class Notifications(private val context: Context) {
             .addAction(0, context.getString(R.string.notif_action_take_all), broadcast(ReminderReceiver.ACTION_TAKE_ALL, slot.name, date.toEpochDay().toString()))
             .addAction(0, context.getString(R.string.notif_action_snooze), broadcast(ReminderReceiver.ACTION_SNOOZE, AlarmKind.SUPPLEMENT.name, slot.name))
             .build()
-        post(supplementId(slot), notification)
+        post(null, supplementId(slot), notification)
     }
 
     fun showLowStock(supplement: Supplement) {
@@ -120,7 +123,7 @@ class Notifications(private val context: Context) {
             .setContentIntent(activityIntent(MainActivity.OPEN_SUPPLEMENTS, null, requestCode = 3000))
             .setAutoCancel(true)
             .build()
-        post(stockId(supplement.id), notification)
+        post(supplement.id, STOCK_ID, notification)
     }
 
     fun showTest() {
@@ -132,20 +135,21 @@ class Notifications(private val context: Context) {
             .setContentIntent(activityIntent(null, null, requestCode = 9999))
             .setAutoCancel(true)
             .build()
-        post(TEST_ID, notification)
+        post(null, TEST_ID, notification)
     }
 
-    fun cancelWorkout(planId: String) = manager.cancel(workoutId(planId))
+    fun cancelWorkout(planId: String) = manager.cancel(planId, WORKOUT_ID)
 
     fun cancelSupplements(slot: TimeSlot) = manager.cancel(supplementId(slot))
 
-    private fun post(id: Int, notification: android.app.Notification) {
+    /** Pläne und Supplements unterscheiden sich über das Tag (ihre ID) – so können sich zwei Benachrichtigungen nie überschreiben. */
+    private fun post(tag: String?, id: Int, notification: android.app.Notification) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) {
             return
         }
-        manager.notify(id, notification)
+        manager.notify(tag, id, notification)
     }
 
     private fun activityIntent(open: String?, planId: String?, requestCode: Int): PendingIntent {
@@ -156,12 +160,13 @@ class Notifications(private val context: Context) {
         return PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
-    private fun broadcast(action: String, kind: String, ref: String): PendingIntent {
+    private fun broadcast(action: String, kind: String, ref: String, epochDay: Long? = null): PendingIntent {
         val intent = Intent(context, ReminderReceiver::class.java)
             .setAction(action)
             .setData("fitplan://action/$action/$kind/$ref".toUri())
             .putExtra(ReminderReceiver.EXTRA_KIND, kind)
             .putExtra(ReminderReceiver.EXTRA_REF, ref)
+        if (epochDay != null) intent.putExtra(ReminderReceiver.EXTRA_DAY, epochDay)
         return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
@@ -170,9 +175,9 @@ class Notifications(private val context: Context) {
         const val CHANNEL_SUPPLEMENTS = "supplements"
         const val CHANNEL_STOCK = "stock"
         private const val TEST_ID = 9999
+        private const val WORKOUT_ID = 1000
+        private const val STOCK_ID = 3000
 
-        private fun workoutId(planId: String) = 1000 + Math.floorMod(planId.hashCode(), 900)
         private fun supplementId(slot: TimeSlot) = 2000 + slot.ordinal
-        private fun stockId(supplementId: String) = 3000 + Math.floorMod(supplementId.hashCode(), 900)
     }
 }

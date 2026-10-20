@@ -45,6 +45,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -78,7 +79,7 @@ fun SettingsScreen(data: AppData, onBack: () -> Unit) {
     val scope = rememberCoroutineScope()
     val snackbar = remember { SnackbarHostState() }
     val settings = data.settings
-    var editName by remember { mutableStateOf(false) }
+    var editName by rememberSaveable { mutableStateOf(false) }
     var confirmReset by remember { mutableStateOf(false) }
     var pendingImport by remember { mutableStateOf<String?>(null) }
 
@@ -327,9 +328,9 @@ fun SettingsScreen(data: AppData, onBack: () -> Unit) {
 }
 
 /** Öffnet die Dateiauswahl; fehlt sie auf dem Gerät, gibt es einen Hinweis statt eines Absturzes. */
-private fun launchPicker(scope: CoroutineScope, snackbar: SnackbarHostState, message: String, launch: () -> Unit) {
+private fun launchPicker(scope: CoroutineScope, snackbar: SnackbarHostState, message: String, open: () -> Unit) {
     try {
-        launch()
+        open()
     } catch (_: ActivityNotFoundException) {
         scope.launch { snackbar.showSnackbar(message) }
     }

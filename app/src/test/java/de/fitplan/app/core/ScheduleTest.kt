@@ -1,6 +1,7 @@
 package de.fitplan.app.core
 
 import de.fitplan.app.core.logic.AlarmKind
+import de.fitplan.app.core.logic.minuteToTime
 import de.fitplan.app.core.logic.nextFollowUpReminder
 import de.fitplan.app.core.logic.nextSupplementReminder
 import de.fitplan.app.core.logic.nextWorkoutReminder
@@ -96,5 +97,12 @@ class ScheduleTest {
         val alarms = planAlarms(data, MONDAY.atTime(6, 0))
         assertEquals(setOf(AlarmKind.WORKOUT, AlarmKind.WORKOUT_FOLLOW_UP, AlarmKind.SUPPLEMENT), alarms.map { it.kind }.toSet())
         assertTrue(alarms.all { it.at.isAfter(MONDAY.atTime(6, 0)) })
+    }
+
+    @Test
+    fun `minute of day always yields a valid time`() {
+        assertEquals(LocalTime.of(23, 30), minuteToTime(-30))
+        assertEquals(LocalTime.of(0, 15), minuteToTime(24 * 60 + 15))
+        assertEquals(LocalTime.of(7, 30), minuteToTime(7 * 60 + 30))
     }
 }

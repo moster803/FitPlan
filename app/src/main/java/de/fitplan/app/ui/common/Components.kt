@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import de.fitplan.app.R
+import de.fitplan.app.core.logic.minuteToTime
 import de.fitplan.app.core.model.ALL_DAYS
 import de.fitplan.app.core.model.WEEKDAYS
 import de.fitplan.app.ui.theme.Accent
@@ -230,7 +231,8 @@ fun TimePickerDialog(
     onConfirm: (Int) -> Unit,
     title: String = stringResource(R.string.pick_time),
 ) {
-    val state = rememberTimePickerState(initialHour = initialMinute / 60, initialMinute = initialMinute % 60, is24Hour = true)
+    val time = minuteToTime(initialMinute)
+    val state = rememberTimePickerState(initialHour = time.hour, initialMinute = time.minute, is24Hour = true)
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },

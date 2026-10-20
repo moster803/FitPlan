@@ -56,6 +56,16 @@ data class Reminder(
     val followUpMinuteOfDay: Int = 19 * 60,
 )
 
+/** Ein früherer Trainingsrhythmus eines Plans, damit vergangene Tage nach dem damals gültigen Plan bewertet werden. */
+@Serializable
+data class PastSchedule(
+    /** Erster Tag, an dem dieser Rhythmus nicht mehr galt. */
+    val untilEpochDay: Long,
+    val days: Set<Int>,
+    /** Plan war aktiv und hatte Übungen. */
+    val active: Boolean,
+)
+
 @Serializable
 data class WorkoutPlan(
     val id: String,
@@ -67,6 +77,7 @@ data class WorkoutPlan(
     val reminder: Reminder = Reminder(),
     val createdEpochDay: Long,
     val active: Boolean = true,
+    val scheduleHistory: List<PastSchedule> = emptyList(),
 )
 
 @Serializable
@@ -124,6 +135,8 @@ data class Intake(
     val epochDay: Long,
     val slot: TimeSlot,
     val takenAt: Long,
+    /** Tatsächlich vom Vorrat abgezogene Einheiten; fehlt bei Einträgen aus Version 1.0.0. */
+    val units: Int? = null,
 )
 
 @Serializable

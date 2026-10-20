@@ -111,7 +111,12 @@ fun FitPlanNavHost(data: AppData, launchRequest: LaunchRequest?, onLaunchHandled
     LaunchedEffect(launchRequest) {
         val request = launchRequest ?: return@LaunchedEffect
         when (request.open) {
-            MainActivity.OPEN_PLAYER -> request.planId?.let { nav.navigate(PlayerRoute(it)) { launchSingleTop = true } }
+            MainActivity.OPEN_PLAYER -> request.planId?.let { planId ->
+                // Läuft gerade ein anderes Training, wird es ersetzt; dasselbe Training läuft einfach weiter.
+                val top = nav.currentBackStackEntry
+                val running = top != null && top.destination.hasRoute(PlayerRoute::class) && top.toRoute<PlayerRoute>().planId == planId
+                if (!running) nav.navigate(PlayerRoute(planId)) { popUpTo<PlayerRoute> { inclusive = true } }
+            }
             MainActivity.OPEN_SUPPLEMENTS -> nav.navigateToTab(SupplementsRoute)
         }
         onLaunchHandled()

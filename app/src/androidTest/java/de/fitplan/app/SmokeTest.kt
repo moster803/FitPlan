@@ -9,6 +9,7 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isRoot
@@ -134,8 +135,8 @@ class SmokeTest {
 
         // Erinnerungen und Benachrichtigungen dürfen nicht abstürzen.
         app.scheduler.reschedule(data)
-        app.notifications.showWorkout(data, data.plans.first(), followUp = false, streak = 3)
         val today = LocalDate.now()
+        app.notifications.showWorkout(data, data.plans.first(), followUp = false, streak = 3, date = today)
         app.notifications.showSupplements(TimeSlot.MORNING, data.dueSupplements(today, TimeSlot.MORNING), today)
         app.notifications.showTest()
         // Heads-up-Benachrichtigungen wieder entfernen, damit sie den weiteren Test nicht überdecken.

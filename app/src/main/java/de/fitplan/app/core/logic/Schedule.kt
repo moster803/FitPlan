@@ -12,6 +12,13 @@ import java.time.LocalTime
 fun WorkoutPlan.isScheduledOn(date: LocalDate): Boolean =
     active && steps.isNotEmpty() && date.dayOfWeek.value in days
 
+/** Wie [isScheduledOn], aber für vergangene Tage nach dem damals gültigen Rhythmus – für Serien und Verlauf. */
+fun WorkoutPlan.wasScheduledOn(date: LocalDate): Boolean {
+    val day = date.toEpochDay()
+    val past = scheduleHistory.filter { day < it.untilEpochDay }.minByOrNull { it.untilEpochDay } ?: return isScheduledOn(date)
+    return past.active && date.dayOfWeek.value in past.days
+}
+
 fun Supplement.isDueOn(date: LocalDate): Boolean {
     val day = date.toEpochDay()
     return active && date.dayOfWeek.value in days && day >= createdEpochDay && (endEpochDay == null || day <= endEpochDay)
@@ -43,7 +50,12 @@ fun AppData.pendingSupplements(date: LocalDate, slot: TimeSlot): List<Supplement
     return dueSupplements(date, slot).filterNot { isTaken(it.id, day, slot) }
 }
 
-fun minuteToTime(minuteOfDay: Int): LocalTime = LocalTime.of((minuteOfDay / 60) % 24, minuteOfDay % 60)
+fun minuteToTime(minuteOfDay: Int): LocalTime {
+    val minute = Math.floorMod(minuteOfDay, MINUTES_PER_DAY)
+    return LocalTime.of(minute / 60, minute % 60)
+}
+
+const val MINUTES_PER_DAY = 24 * 60
 
 enum class AlarmKind { WORKOUT, WORKOUT_FOLLOW_UP, SUPPLEMENT }
 

@@ -4,23 +4,34 @@ import de.fitplan.app.core.data.AppJson
 import de.fitplan.app.core.data.DataStorage
 import de.fitplan.app.core.data.FileStorage
 import de.fitplan.app.core.data.FitRepository
+import de.fitplan.app.core.data.SystemZoneClock
 import de.fitplan.app.core.library.PlanTemplates
+import de.fitplan.app.core.logic.DayState
+import de.fitplan.app.core.logic.currentStreak
+import de.fitplan.app.core.logic.dayState
 import de.fitplan.app.core.logic.daysLeft
 import de.fitplan.app.core.logic.interactionHints
 import de.fitplan.app.core.logic.isTaken
+import de.fitplan.app.core.logic.longestStreak
+import de.fitplan.app.core.model.ALL_DAYS
 import de.fitplan.app.core.model.AppData
+import de.fitplan.app.core.model.Reminder
+import de.fitplan.app.core.model.Settings
 import de.fitplan.app.core.model.TimeSlot
+import de.fitplan.app.core.model.WEEKDAYS
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 import java.nio.file.Files
 import java.time.Clock
 import java.time.ZoneId
+import java.util.TimeZone
 
 class RepositoryTest {
 
@@ -149,5 +160,97 @@ class RepositoryTest {
         assertEquals(1, hints.size)
         assertEquals(TimeSlot.MORNING, hints[0].slot)
         assertNotNull(hints[0].message)
+    }
+
+    @Test
+    fun `undo restores only what was deducted`() = runTest {
+        // Kreatin: 5 g pro Einnahme, nur noch 3 g da.
+        val repo = repo(MemoryStorage(AppJson.encode(AppData(supplements = listOf(supplement(trackStock = true, stock = 3, units = 5))))))
+        val day = MONDAY.toEpochDay()
+        repo.toggleIntake("s1", day, TimeSlot.EVENING)
+        assertEquals(0, repo.current().supplements[0].stock)
+        repo.toggleIntake("s1", day, TimeSlot.EVENING)
+        assertEquals(3, repo.current().supplements[0].stock)
+    }
+
+    @Test
+    fun `import rejects json of other apps and keeps data`() = runTest {
+        val repo = repo(MemoryStorage(AppJson.encode(AppData(plans = listOf(plan())))))
+        assertTrue(runCatching { repo.importJson("""{"foo":1}""") }.isFailure)
+        assertTrue(runCatching { repo.importJson("[]") }.isFailure)
+        assertEquals(1, repo.current().plans.size)
+    }
+
+    @Test
+    fun `import repairs values that would crash the app`() = runTest {
+        val broken = AppData(
+            settings = Settings(slotTimes = mapOf(TimeSlot.MORNING to -5)),
+            plans = listOf(
+                plan(days = setOf(0, 3, 8), reminder = Reminder(minuteOfDay = -30, followUpMinuteOfDay = 1500)),
+                plan(), // doppelte ID
+            ),
+            sessions = listOf(session(MONDAY, feeling = 6)),
+        )
+        val repo = repo()
+        repo.importJson(AppJson.encode(broken))
+        val data = repo.current()
+        val plan = data.plans.single()
+        assertEquals(setOf(3), plan.days)
+        assertEquals(0, plan.reminder.minuteOfDay)
+        assertEquals(24 * 60 - 1, plan.reminder.followUpMinuteOfDay)
+        assertNull(data.sessions.single().feeling)
+        assertEquals(0, data.settings.slotMinute(TimeSlot.MORNING))
+        assertTrue(data.settings.onboardingDone)
+    }
+
+    @Test
+    fun `finishing onboarding twice creates plans once`() = runTest {
+        val repo = repo()
+        repeat(2) { repo.completeOnboarding("Mo", listOf(PlanTemplates.dailyBack), reminderMinute = 7 * 60, supplements = listOf(supplement())) }
+        val data = repo.current()
+        assertEquals(1, data.plans.size)
+        assertEquals(1, data.supplements.size)
+    }
+
+    @Test
+    fun `quick log counts once per day`() = runTest {
+        val repo = repo(MemoryStorage(AppJson.encode(AppData(plans = listOf(plan())))))
+        val first = repo.logSession("p1", 600, 1, 1, quickLog = true)
+        val second = repo.logSession("p1", 600, 1, 1, quickLog = true)
+        assertEquals(first, second)
+        assertEquals(1, repo.current().sessions.size)
+        // „Schon erledigt“ aus der Benachrichtigung von gestern zählt für gestern.
+        repo.logSession("p1", 600, 1, 1, quickLog = true, epochDay = MONDAY.minusDays(1).toEpochDay())
+        assertEquals(listOf(MONDAY.toEpochDay(), MONDAY.minusDays(1).toEpochDay()), repo.current().sessions.map { it.epochDay })
+    }
+
+    @Test
+    fun `adding training days does not turn past days into missed ones`() = runTest {
+        val weekdaysPlan = plan(days = WEEKDAYS, created = MONDAY.minusDays(21))
+        // Drei Wochen lang jeden Werktag trainiert.
+        val sessions = (1L..21L).map { MONDAY.minusDays(it) }.filter { it.dayOfWeek.value <= 5 }.map { session(it) }
+        val repo = repo(MemoryStorage(AppJson.encode(AppData(plans = listOf(weekdaysPlan), sessions = sessions))))
+        assertEquals(15, repo.current().currentStreak(MONDAY))
+
+        repo.upsertPlan(weekdaysPlan.copy(days = ALL_DAYS))
+        val data = repo.current()
+        assertEquals(15, data.currentStreak(MONDAY))
+        assertEquals(15, data.longestStreak(MONDAY))
+        // Am Sonntag galt noch der alte Rhythmus, ab heute der neue.
+        assertEquals(DayState.REST, data.dayState(MONDAY.minusDays(1), MONDAY))
+        assertEquals(DayState.OPEN, data.dayState(MONDAY, MONDAY))
+    }
+
+    @Test
+    fun `system clock follows time zone changes`() {
+        val original = TimeZone.getDefault()
+        try {
+            TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"))
+            assertEquals(ZoneId.of("Europe/Berlin"), SystemZoneClock.zone)
+            TimeZone.setDefault(TimeZone.getTimeZone("America/New_York"))
+            assertEquals(ZoneId.of("America/New_York"), SystemZoneClock.zone)
+        } finally {
+            TimeZone.setDefault(original)
+        }
     }
 }

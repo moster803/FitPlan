@@ -43,8 +43,15 @@ class ReminderReceiver : BroadcastReceiver() {
                 when (kind?.let { runCatching { AlarmKind.valueOf(it) }.getOrNull() }) {
                     AlarmKind.WORKOUT, AlarmKind.WORKOUT_FOLLOW_UP -> {
                         val plan = data.plan(ref)
-                        if (plan != null && plan.isScheduledOn(today) && !data.isPlanDone(plan.id, today.toEpochDay())) {
-                            app.notifications.showWorkout(data, plan, kind == AlarmKind.WORKOUT_FOLLOW_UP.name, data.currentStreak(today))
+                        val followUp = kind == AlarmKind.WORKOUT_FOLLOW_UP.name
+                        if (plan != null &&
+                            // Auch ein zurückgestellter Wecker richtet sich nach den aktuellen Einstellungen.
+                            plan.reminder.enabled &&
+                            (!followUp || plan.reminder.followUp) &&
+                            plan.isScheduledOn(today) &&
+                            !data.isPlanDone(plan.id, today.toEpochDay())
+                        ) {
+                            app.notifications.showWorkout(data, plan, followUp, data.currentStreak(today), today)
                         }
                     }
                     AlarmKind.SUPPLEMENT -> {
@@ -72,9 +79,8 @@ class ReminderReceiver : BroadcastReceiver() {
                 val data = repository.current()
                 val plan = data.plan(ref) ?: return
                 app.notifications.cancelWorkout(ref)
-                if (!data.isPlanDone(plan.id, repository.today().toEpochDay())) {
-                    repository.logSession(plan.id, data.estimatedSeconds(plan), plan.steps.size, plan.steps.size, quickLog = true)
-                }
+                val day = intent.getLongExtra(EXTRA_DAY, NO_DAY).takeIf { it != NO_DAY } ?: repository.today().toEpochDay()
+                repository.logSession(plan.id, data.estimatedSeconds(plan), plan.steps.size, plan.steps.size, quickLog = true, epochDay = day)
             }
             ACTION_TAKE_ALL -> {
                 val slot = kind?.let { runCatching { TimeSlot.valueOf(it) }.getOrNull() } ?: return
@@ -93,6 +99,8 @@ class ReminderReceiver : BroadcastReceiver() {
         const val ACTION_TAKE_ALL = "de.fitplan.app.action.TAKE_ALL"
         const val EXTRA_KIND = "kind"
         const val EXTRA_REF = "ref"
+        const val EXTRA_DAY = "day"
+        private const val NO_DAY = Long.MIN_VALUE
     }
 }
 

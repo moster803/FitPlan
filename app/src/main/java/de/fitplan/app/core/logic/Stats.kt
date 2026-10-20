@@ -33,7 +33,7 @@ private fun AppData.firstTrackedDay(): Long? {
 fun AppData.dayState(date: LocalDate, today: LocalDate): DayState {
     val day = date.toEpochDay()
     if (sessions.any { it.epochDay == day }) return DayState.DONE
-    val scheduled = plans.any { it.isScheduledOn(date) && it.createdEpochDay <= day }
+    val scheduled = plans.any { it.wasScheduledOn(date) && it.createdEpochDay <= day }
     return when {
         !scheduled -> DayState.REST
         date.isBefore(today) -> DayState.MISSED
@@ -72,7 +72,7 @@ fun AppData.currentPlanStreak(plan: WorkoutPlan, today: LocalDate): Int {
         if (day < first) return streak
         when {
             planSessions.any { it.epochDay == day } -> streak++
-            plan.isScheduledOn(date) && date.isBefore(today) -> return streak
+            plan.wasScheduledOn(date) && date.isBefore(today) -> return streak
         }
         date = date.minusDays(1)
     }
