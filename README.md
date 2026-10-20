@@ -81,7 +81,7 @@ Bauen und testen:
 ./gradlew assembleRelease     # signiertes APK unter app/build/outputs/apk/release/
 ```
 
-Jeder Push baut die App per GitHub Actions; ein Tag `v*` (z. B. `v1.0.0`) veröffentlicht die APK zusätzlich als Release.
+Jeder Push baut die App per GitHub Actions. Für ein Release auf GitHub unter **Releases › „Draft a new release“** einen neuen Tag `v*` (z. B. `v1.0.0`) anlegen und veröffentlichen – oder den Tag per `git push` hochladen. Der Workflow hängt dann die `FitPlan.apk` an und übernimmt die Beschreibung aus `.github/release-notes.md`.
 
 > Der mitgelieferte Signaturschlüssel (`app/signing/fitplan.jks`) ist nur für selbst installierte APKs gedacht. Für eine Veröffentlichung im Play Store einen eigenen, geheimen Schlüssel verwenden – und die Berechtigung `USE_EXACT_ALARM` prüfen, die Google nur Wecker- und Kalender-Apps erlaubt.
 
