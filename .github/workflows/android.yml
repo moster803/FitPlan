@@ -1,0 +1,65 @@
+name: Android-Build
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Testen & APK bauen
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v5
+
+      - name: Unit-Tests
+        run: ./gradlew --stacktrace testDebugUnitTest
+
+      - name: Lint
+        run: ./gradlew --stacktrace lintDebug
+
+      - name: APK bauen
+        run: ./gradlew --stacktrace assembleRelease
+
+      - name: APK umbenennen
+        run: |
+          mkdir -p dist
+          cp app/build/outputs/apk/release/app-release.apk dist/FitPlan.apk
+
+      - name: APK hochladen
+        uses: actions/upload-artifact@v5
+        with:
+          name: FitPlan-apk
+          path: dist/FitPlan.apk
+
+      - name: Berichte hochladen
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: berichte
+          path: |
+            app/build/reports/
+            app/build/test-results/
+          if-no-files-found: ignore
+
+      - name: Release veröffentlichen
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/FitPlan.apk
+          generate_release_notes: true
