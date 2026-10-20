@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -193,10 +192,10 @@ private fun ActiveContent(
             }
             Spacer(Modifier.width(48.dp))
         }
+        // Bewusst ohne Animation: Der Wert ändert sich zehnmal pro Sekunde und läuft so schon flüssig.
         val progress = (state.index + phaseFraction(phase, state.remainingMs)) / ui.phases.size
-        val animatedProgress by animateFloatAsState(progress, label = "progress")
         LinearProgressIndicator(
-            progress = { animatedProgress },
+            progress = { progress },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),

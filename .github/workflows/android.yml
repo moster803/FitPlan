@@ -114,13 +114,19 @@ jobs:
           ram-size: 3072M
           disk-size: 4096M
           disable-animations: true
-          script: ./gradlew connectedDebugAndroidTest
+          script: |
+            ./gradlew connectedDebugAndroidTest || touch ui-test-failed
+            mkdir -p device-screenshots
+            adb shell ls -R /sdcard/Android/media/de.fitplan.app.debug /sdcard/Android/data/de.fitplan.app.debug/files || true
+            adb pull /sdcard/Android/media/de.fitplan.app.debug device-screenshots/media || true
+            adb pull /sdcard/Android/data/de.fitplan.app.debug/files/screenshots device-screenshots/files || true
+            test ! -f ui-test-failed
 
       - name: Screenshots ins Log schreiben
         if: always()
         run: |
           # Verkleinerte Screenshots als Base64 ins Log, damit sie auch ohne Artefakt-Download prüfbar sind.
-          find app/build/outputs/connected_android_test_additional_output -name '*.png' 2>/dev/null | sort | while read -r f; do
+          find app/build/outputs/connected_android_test_additional_output device-screenshots -name '*.png' 2>/dev/null | sort -u -t/ -k1 | while read -r f; do
             name=$(basename "$f" .png)
             convert "$f" -resize 360x -quality 70 "/tmp/$name.jpg" || continue
             echo "SHOT-BEGIN $name"
@@ -135,6 +141,7 @@ jobs:
           name: ui-test
           path: |
             app/build/outputs/connected_android_test_additional_output/
+            device-screenshots/
             app/build/reports/androidTests/
             app/build/outputs/androidTest-results/
           if-no-files-found: ignore
