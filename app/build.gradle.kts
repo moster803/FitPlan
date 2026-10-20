@@ -38,8 +38,8 @@ android {
             signingConfig = signingConfigs.getByName("sideload")
         }
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            // Ohne R8: Das Release-APK enthält denselben Code, den der UI-Test im Emulator prüft.
+            isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("sideload")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

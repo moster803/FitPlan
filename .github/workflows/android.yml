@@ -41,6 +41,7 @@ jobs:
         run: |
           mkdir -p dist
           cp app/build/outputs/apk/release/app-release.apk dist/FitPlan.apk
+          ls -la dist/
 
       - name: APK hochladen
         uses: actions/upload-artifact@v5
