@@ -12,8 +12,10 @@ import java.time.LocalTime
 fun WorkoutPlan.isScheduledOn(date: LocalDate): Boolean =
     active && steps.isNotEmpty() && date.dayOfWeek.value in days
 
-fun Supplement.isDueOn(date: LocalDate): Boolean =
-    active && date.dayOfWeek.value in days && (endEpochDay == null || date.toEpochDay() <= endEpochDay)
+fun Supplement.isDueOn(date: LocalDate): Boolean {
+    val day = date.toEpochDay()
+    return active && date.dayOfWeek.value in days && day >= createdEpochDay && (endEpochDay == null || day <= endEpochDay)
+}
 
 fun Supplement.isDueOn(date: LocalDate, slot: TimeSlot): Boolean = slot in slots && isDueOn(date)
 

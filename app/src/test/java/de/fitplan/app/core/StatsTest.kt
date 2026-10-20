@@ -118,4 +118,15 @@ class StatsTest {
         assertEquals(0.75f, data.supplementAdherence(MONDAY, MONDAY.plusDays(1))!!, 0.001f)
         assertNull(AppData().supplementAdherence(MONDAY, MONDAY))
     }
+
+    @Test
+    fun `supplements are not due before they were added`() {
+        val added = supplement().copy(createdEpochDay = MONDAY.toEpochDay())
+        val data = AppData(
+            supplements = listOf(added),
+            intakes = listOf(Intake("s1", MONDAY.toEpochDay(), TimeSlot.EVENING, 0)),
+        )
+        // Sonntag zählt nicht mit – sonst läge die Quote bei 50 %.
+        assertEquals(1f, data.supplementAdherence(MONDAY.minusDays(1), MONDAY)!!, 0.001f)
+    }
 }
