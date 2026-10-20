@@ -94,6 +94,7 @@ val ExerciseCategory.label: Int
         ExerciseCategory.STRENGTH -> R.string.category_strength
         ExerciseCategory.STRETCH -> R.string.category_stretch
         ExerciseCategory.RELAX -> R.string.category_relax
+        ExerciseCategory.ENDURANCE -> R.string.category_endurance
     }
 
 val ExerciseCategory.emoji: String
@@ -102,6 +103,7 @@ val ExerciseCategory.emoji: String
         ExerciseCategory.STRENGTH -> "💪"
         ExerciseCategory.STRETCH -> "🤸"
         ExerciseCategory.RELAX -> "🌿"
+        ExerciseCategory.ENDURANCE -> "🚶"
     }
 
 @Composable

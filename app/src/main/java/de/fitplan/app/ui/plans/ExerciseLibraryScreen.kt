@@ -15,10 +15,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.material.icons.rounded.Science
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,6 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -41,27 +44,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import de.fitplan.app.R
+import de.fitplan.app.core.library.Evidence
 import de.fitplan.app.core.logic.allExercises
 import de.fitplan.app.core.model.AppData
 import de.fitplan.app.core.model.Exercise
-import de.fitplan.app.core.model.ExerciseCategory
 import de.fitplan.app.core.model.ExerciseMode
 import de.fitplan.app.ui.LocalActions
 import de.fitplan.app.ui.common.ConfirmDialog
 import de.fitplan.app.ui.common.EmojiAvatar
 import de.fitplan.app.ui.common.emoji
 import de.fitplan.app.ui.common.label
+import de.fitplan.app.ui.evidence.SourceLinks
 import de.fitplan.app.ui.theme.FitTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExerciseLibraryScreen(data: AppData, onBack: () -> Unit) {
+fun ExerciseLibraryScreen(data: AppData, initialFilter: String?, onBack: () -> Unit, onOpenEvidence: () -> Unit) {
     val actions = LocalActions.current
-    var filter by rememberSaveable { mutableStateOf<ExerciseCategory?>(null) }
+    var filter by rememberSaveable { mutableStateOf(initialFilter) }
     var editing by remember { mutableStateOf<Exercise?>(null) }
     var creating by rememberSaveable { mutableStateOf(false) }
     var deleting by remember { mutableStateOf<Exercise?>(null) }
-    val exercises = data.allExercises().filter { filter == null || it.category == filter }
+    val exercises = data.allExercises().filter { it.matchesFilter(filter) }
 
     Scaffold(
         topBar = {
@@ -90,18 +94,37 @@ fun ExerciseLibraryScreen(data: AppData, onBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             item {
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(vertical = 8.dp)) {
-                    item {
-                        FilterChip(selected = filter == null, onClick = { filter = null }, label = { Text(stringResource(R.string.filter_all)) })
-                    }
-                    items(ExerciseCategory.entries) { category ->
-                        FilterChip(
-                            selected = filter == category,
-                            onClick = { filter = category },
-                            label = { Text(category.emoji + " " + stringResource(category.label)) },
-                        )
+                Card(
+                    onClick = onOpenEvidence,
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+                    modifier = Modifier.padding(top = 8.dp),
+                ) {
+                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Rounded.Science, contentDescription = null, tint = MaterialTheme.colorScheme.onTertiaryContainer)
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                stringResource(R.string.evidence_title),
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                            )
+                            Text(
+                                stringResource(R.string.evidence_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                            )
+                        }
+                        Icon(Icons.Rounded.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onTertiaryContainer)
                     }
                 }
+            }
+            item {
+                ApproachFilterRow(
+                    selected = filter,
+                    onSelect = { filter = it },
+                    showCustom = data.customExercises.isNotEmpty(),
+                    modifier = Modifier.padding(vertical = 4.dp),
+                )
             }
             items(exercises, key = { it.id }) { exercise ->
                 ExerciseCard(
@@ -152,12 +175,16 @@ fun ExerciseCard(exercise: Exercise, onEdit: (() -> Unit)?, onDelete: (() -> Uni
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                EmojiAvatar(exercise.category.emoji, FitTheme.accent(exercise.category.ordinal), size = 40.dp)
+                EmojiAvatar(
+                    exercise.approach?.let { Evidence.info(it).emoji } ?: exercise.category.emoji,
+                    FitTheme.accent(exercise.approach?.ordinal ?: exercise.category.ordinal),
+                    size = 40.dp,
+                )
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(exercise.name, style = MaterialTheme.typography.titleMedium)
                     Text(
-                        stringResource(exercise.category.label) + " · " + defaultAmount(exercise),
+                        exerciseKind(exercise) + " · " + defaultAmount(exercise),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -182,9 +209,16 @@ fun ExerciseCard(exercise: Exercise, onEdit: (() -> Unit)?, onDelete: (() -> Uni
 }
 
 @Composable
-fun ExerciseDetails(exercise: Exercise) {
+fun ExerciseDetails(exercise: Exercise, showEvidence: Boolean = true) {
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         if (exercise.description.isNotBlank()) Text(exercise.description, style = MaterialTheme.typography.bodyMedium)
+        if (exercise.equipment.isNotBlank()) {
+            Text(
+                "🧰 " + stringResource(R.string.equipment, exercise.equipment),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
         exercise.steps.forEachIndexed { index, step ->
             Row {
                 Text("${index + 1}.", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.width(24.dp))
@@ -193,6 +227,71 @@ fun ExerciseDetails(exercise: Exercise) {
         }
         if (exercise.tip.isNotBlank()) {
             Text("💡 " + exercise.tip, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+        }
+        if (showEvidence) {
+            val approach = exercise.approach
+            if (approach != null) {
+                val info = Evidence.info(approach)
+                Surface(
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.padding(top = 4.dp),
+                ) {
+                    Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(
+                            "${info.emoji} ${stringResource(R.string.evidence_basis)}: ${info.name}",
+                            style = MaterialTheme.typography.titleSmall,
+                        )
+                        Text(info.summary, style = MaterialTheme.typography.bodySmall)
+                        SourceLinks(info.sourceIds)
+                    }
+                }
+            } else if (!exercise.builtIn) {
+                Text(
+                    stringResource(R.string.custom_exercise_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+/** Übungsform (z. B. „Pilates“) bzw. Kategorie bei eigenen Übungen. */
+@Composable
+fun exerciseKind(exercise: Exercise): String =
+    exercise.approach?.let { Evidence.info(it).name } ?: stringResource(exercise.category.label)
+
+/** Filterwert: null = alle, Name einer [Approach] oder [FILTER_CUSTOM]. */
+const val FILTER_CUSTOM = "custom"
+
+fun Exercise.matchesFilter(filter: String?): Boolean = when (filter) {
+    null -> true
+    FILTER_CUSTOM -> !builtIn
+    else -> approach?.name == filter
+}
+
+@Composable
+fun ApproachFilterRow(selected: String?, onSelect: (String?) -> Unit, showCustom: Boolean, modifier: Modifier = Modifier) {
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = modifier) {
+        item {
+            FilterChip(selected = selected == null, onClick = { onSelect(null) }, label = { Text(stringResource(R.string.filter_all)) })
+        }
+        items(Evidence.approaches, key = { it.approach.name }) { info ->
+            FilterChip(
+                selected = selected == info.approach.name,
+                onClick = { onSelect(info.approach.name) },
+                label = { Text(info.emoji + " " + info.name) },
+            )
+        }
+        if (showCustom) {
+            item {
+                FilterChip(
+                    selected = selected == FILTER_CUSTOM,
+                    onClick = { onSelect(FILTER_CUSTOM) },
+                    label = { Text("✏️ " + stringResource(R.string.filter_custom)) },
+                )
+            }
         }
     }
 }

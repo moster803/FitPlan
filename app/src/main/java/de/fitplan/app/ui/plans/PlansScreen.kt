@@ -21,6 +21,7 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.automirrored.rounded.MenuBook
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Science
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -71,6 +72,7 @@ fun PlansScreen(
     onEditPlan: (String) -> Unit,
     onNewPlan: (String?) -> Unit,
     onOpenLibrary: () -> Unit,
+    onOpenEvidence: () -> Unit,
 ) {
     var showTemplates by rememberSaveable { mutableStateOf(false) }
     val today = rememberToday()
@@ -125,6 +127,30 @@ fun PlansScreen(
                             )
                         }
                         Icon(Icons.Rounded.ChevronRight, contentDescription = null)
+                    }
+                }
+            }
+            item {
+                Card(
+                    onClick = onOpenEvidence,
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+                ) {
+                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Rounded.Science, contentDescription = null, tint = MaterialTheme.colorScheme.onTertiaryContainer)
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                stringResource(R.string.evidence_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                            )
+                            Text(
+                                stringResource(R.string.evidence_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                            )
+                        }
+                        Icon(Icons.Rounded.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onTertiaryContainer)
                     }
                 }
             }

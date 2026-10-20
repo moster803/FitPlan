@@ -37,7 +37,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -70,11 +69,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.fitplan.app.R
+import de.fitplan.app.core.library.Evidence
 import de.fitplan.app.core.logic.allExercises
 import de.fitplan.app.core.logic.findExercise
 import de.fitplan.app.core.model.AppData
 import de.fitplan.app.core.model.Exercise
-import de.fitplan.app.core.model.ExerciseCategory
 import de.fitplan.app.core.model.ExerciseMode
 import de.fitplan.app.core.model.PlanStep
 import de.fitplan.app.core.model.Reminder
@@ -88,7 +87,6 @@ import de.fitplan.app.ui.common.Stepper
 import de.fitplan.app.ui.common.TimePickerDialog
 import de.fitplan.app.ui.common.emoji
 import de.fitplan.app.ui.common.formatMinute
-import de.fitplan.app.ui.common.label
 import de.fitplan.app.ui.common.rememberToday
 import de.fitplan.app.ui.common.stepSummary
 import de.fitplan.app.ui.theme.ACCENT_COUNT
@@ -484,10 +482,10 @@ private fun ExercisePickerSheet(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var query by rememberSaveable { mutableStateOf("") }
-    var category by rememberSaveable { mutableStateOf<ExerciseCategory?>(null) }
+    var filter by rememberSaveable { mutableStateOf<String?>(null) }
     var creating by rememberSaveable { mutableStateOf(false) }
     val filtered = exercises.filter {
-        (category == null || it.category == category) &&
+        it.matchesFilter(filter) &&
             (query.isBlank() || it.name.contains(query.trim(), ignoreCase = true) || it.description.contains(query.trim(), ignoreCase = true))
     }
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
@@ -507,19 +505,12 @@ private fun ExercisePickerSheet(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
             )
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(horizontal = 16.dp),
-            ) {
-                item { FilterChip(selected = category == null, onClick = { category = null }, label = { Text(stringResource(R.string.filter_all)) }) }
-                items(ExerciseCategory.entries) { item ->
-                    FilterChip(
-                        selected = category == item,
-                        onClick = { category = item },
-                        label = { Text(item.emoji + " " + stringResource(item.label)) },
-                    )
-                }
-            }
+            ApproachFilterRow(
+                selected = filter,
+                onSelect = { filter = it },
+                showCustom = exercises.any { !it.builtIn },
+                modifier = Modifier.padding(horizontal = 16.dp),
+            )
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
@@ -541,12 +532,12 @@ private fun ExercisePickerSheet(
                             .padding(horizontal = 24.dp, vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text(exercise.category.emoji, fontSize = 22.sp)
+                        Text(exercise.approach?.let { Evidence.info(it).emoji } ?: exercise.category.emoji, fontSize = 22.sp)
                         Spacer(Modifier.width(16.dp))
                         Column(Modifier.weight(1f)) {
                             Text(exercise.name, style = MaterialTheme.typography.bodyLarge)
                             Text(
-                                defaultAmount(exercise),
+                                exerciseKind(exercise) + " · " + defaultAmount(exercise),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )

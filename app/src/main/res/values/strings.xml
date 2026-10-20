@@ -30,6 +30,7 @@
     <string name="move_up">Nach oben</string>
     <string name="move_down">Nach unten</string>
     <string name="filter_all">Alle</string>
+    <string name="filter_custom">Eigene</string>
     <string name="unknown_exercise">Unbekannte Übung</string>
     <string name="deleted_plan">Gelöschter Plan</string>
 
@@ -103,6 +104,7 @@
     <string name="category_strength">Kräftigung</string>
     <string name="category_stretch">Dehnung</string>
     <string name="category_relax">Entspannung</string>
+    <string name="category_endurance">Ausdauer</string>
     <string name="mode_reps">Wiederholungen</string>
     <string name="mode_timed">Zeit</string>
     <string name="step_reps">%1$d Wdh.</string>
@@ -115,7 +117,20 @@
     <string name="exercise_delete_text">„%1$s“ wird gelöscht und aus allen Plänen entfernt.</string>
     <string name="exercise_disclaimer">Bei Schmerzen die Übung abbrechen. Die Übungen ersetzen keine ärztliche oder physiotherapeutische Beratung – eigene Übungen aus der Physiotherapie kannst du in der Übungsbibliothek anlegen.</string>
     <string name="library_title">Übungsbibliothek</string>
-    <string name="library_subtitle">%1$d Übungen mit Anleitungen und Tipps</string>
+    <string name="library_subtitle">%1$d Übungen mit Anleitung und Studiengrundlage</string>
+    <string name="evidence_title">Was sagt die Forschung?</string>
+    <string name="evidence_subtitle">Welche Übungen bei Rückenschmerzen nachweislich helfen</string>
+    <string name="evidence_intro">Alle Übungen in FitPlan gehören zu Übungsformen, deren Wirkung bei Rücken- oder Nackenschmerzen in Leitlinien, Cochrane-Reviews oder großen Studien belegt ist. Studien untersuchen dabei meist ganze Übungsprogramme, nicht einzelne Übungen.</string>
+    <string name="evidence_key_findings">Das Wichtigste in Kürze</string>
+    <string name="evidence_approaches">Übungsformen im Überblick</string>
+    <string name="evidence_red_flags">Warnzeichen – bitte ärztlich abklären</string>
+    <string name="evidence_red_flags_text">Diese Hinweise können auf eine ernsthafte Ursache deuten. Dann bitte nicht selbst trainieren, sondern zur Ärztin oder zum Arzt gehen:</string>
+    <string name="evidence_sources">Quellen</string>
+    <string name="evidence_basis">Wissenschaftliche Grundlage</string>
+    <string name="evidence_exercise_count">%1$d Übungen</string>
+    <string name="evidence_show_exercises">Übungen anzeigen</string>
+    <string name="equipment">Hilfsmittel: %1$s</string>
+    <string name="custom_exercise_hint">Eigene Übung – ohne Studienangabe</string>
     <string name="search_exercises">Übung suchen</string>
 
     <!-- Formularfelder -->

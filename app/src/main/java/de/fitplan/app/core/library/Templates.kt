@@ -37,7 +37,7 @@ object PlanTemplates {
         name = "Rücken täglich",
         emoji = "🧘",
         color = 0,
-        description = "Ausgewogene 12-Minuten-Routine aus Mobilisation, Kräftigung und Dehnung.",
+        description = "12 Minuten aus Stabilisation, Kräftigung, Yoga und Dehnung – den Übungsformen mit der besten Studienlage.",
         days = ALL_DAYS,
         reminder = Reminder(minuteOfDay = 8 * 60, followUpMinuteOfDay = 19 * 60),
         steps = listOf(
@@ -58,18 +58,40 @@ object PlanTemplates {
         name = "Rücken-Kräftigung",
         emoji = "💪",
         color = 2,
-        description = "Intensiver für einen stabilen Rumpf – dreimal pro Woche.",
+        description = "Kraft- und Stabilisationstraining – laut Studien besonders gut für Belastbarkeit im Alltag. Dreimal pro Woche.",
         days = setOf(1, 3, 5),
         reminder = Reminder(minuteOfDay = 18 * 60, followUp = false),
         steps = listOf(
             StepSpec("cat_cow", reps = 10),
             StepSpec("bird_dog", sets = 3, reps = 10, rest = 20),
-            StepSpec("glute_bridge", sets = 3, reps = 15, rest = 20),
             StepSpec("dead_bug", sets = 3, reps = 10, rest = 20),
-            StepSpec("plank", sets = 3, seconds = 40, rest = 30),
+            StepSpec("chair_squat", sets = 3, reps = 12, rest = 30),
+            StepSpec("hip_hinge", sets = 3, reps = 10, rest = 30),
+            StepSpec("single_leg_bridge", sets = 3, reps = 8, rest = 20),
             StepSpec("side_plank", sets = 2, seconds = 25, rest = 20),
             StepSpec("superman", sets = 3, reps = 10, rest = 20),
             StepSpec("childs_pose", seconds = 60, rest = 0),
+        ),
+    )
+
+    val pilates = PlanTemplate(
+        key = "pilates_back",
+        name = "Pilates für den Rücken",
+        emoji = "🤸",
+        color = 6,
+        description = "Matten-Pilates – in Studienvergleichen eine der wirksamsten Übungsformen gegen Rückenschmerzen.",
+        days = setOf(2, 4, 6),
+        reminder = Reminder(minuteOfDay = 18 * 60 + 30, followUp = false),
+        steps = listOf(
+            StepSpec("drawing_in", reps = 6, rest = 10),
+            StepSpec("pilates_bridge", sets = 2, reps = 8),
+            StepSpec("pilates_toe_taps", sets = 2, reps = 8),
+            StepSpec("pilates_single_leg_stretch", sets = 2, reps = 8),
+            StepSpec("pilates_leg_circles", reps = 10),
+            StepSpec("pilates_clam", sets = 2, reps = 12),
+            StepSpec("pilates_swimming", sets = 2, seconds = 20, rest = 20),
+            StepSpec("pilates_spine_stretch", reps = 6),
+            StepSpec("childs_pose", seconds = 45, rest = 0),
         ),
     )
 
@@ -78,15 +100,16 @@ object PlanTemplates {
         name = "Büro-Pause",
         emoji = "🪑",
         color = 4,
-        description = "5 Minuten am Schreibtisch – ohne Matte, ohne Umziehen.",
+        description = "5 Minuten am Schreibtisch – ohne Matte: Streckung, Mobilisation, Kräftigung und ein paar Schritte.",
         days = WEEKDAYS,
         reminder = Reminder(minuteOfDay = 14 * 60, followUp = false),
         steps = listOf(
+            StepSpec("standing_extension", reps = 8, rest = 5),
+            StepSpec("seated_cat_cow", reps = 8, rest = 5),
             StepSpec("chin_tuck", reps = 10, rest = 5),
             StepSpec("shoulder_squeeze", reps = 12, rest = 5),
-            StepSpec("seated_twist", seconds = 20, rest = 5),
-            StepSpec("side_bend", seconds = 20, rest = 5),
-            StepSpec("belly_breathing", seconds = 60, rest = 0),
+            StepSpec("chair_squat", reps = 10, rest = 5),
+            StepSpec("brisk_walk", seconds = 120, rest = 0),
         ),
     )
 
@@ -95,7 +118,7 @@ object PlanTemplates {
         name = "Abend-Entspannung",
         emoji = "🌙",
         color = 5,
-        description = "Sanfte Dehnungen zum Runterkommen vor dem Schlafen.",
+        description = "Sanftes Yoga und Dehnen zum Runterkommen – Yoga- und Dehnprogramme wirkten in Studien ähnlich gut.",
         days = ALL_DAYS,
         reminder = Reminder(minuteOfDay = 21 * 60 + 30, followUp = false),
         steps = listOf(
@@ -108,7 +131,38 @@ object PlanTemplates {
         ),
     )
 
-    val all = listOf(dailyBack, strength, office, evening)
+    val walking = PlanTemplate(
+        key = "walk_back",
+        name = "Rücken-Spaziergang",
+        emoji = "🚶",
+        color = 7,
+        description = "30 Minuten zügig gehen an fünf Tagen pro Woche – wie in der WalkBack-Studie, die Rückfälle deutlich hinauszögerte.",
+        days = setOf(1, 2, 4, 5, 6),
+        reminder = Reminder(minuteOfDay = 17 * 60 + 30, followUp = true, followUpMinuteOfDay = 19 * 60 + 30),
+        steps = listOf(
+            StepSpec("brisk_walk", seconds = 30 * 60, rest = 0),
+        ),
+    )
+
+    val neck = PlanTemplate(
+        key = "neck_shoulders",
+        name = "Nacken & Schultern",
+        emoji = "🦒",
+        color = 3,
+        description = "Gezielte Kräftigung mit leichten Gewichten – so linderte das Training in der Andersen-Studie chronische Nackenschmerzen. Dreimal pro Woche.",
+        days = setOf(1, 3, 5),
+        reminder = Reminder(minuteOfDay = 12 * 60 + 30, followUp = false),
+        steps = listOf(
+            StepSpec("chin_tuck", sets = 2, reps = 10, rest = 15),
+            StepSpec("shrugs", sets = 3, reps = 10, rest = 30),
+            StepSpec("one_arm_row", sets = 3, reps = 10, rest = 30),
+            StepSpec("reverse_fly", sets = 3, reps = 10, rest = 30),
+            StepSpec("lateral_raise", sets = 3, reps = 10, rest = 30),
+            StepSpec("prone_w", sets = 2, reps = 10, rest = 0),
+        ),
+    )
+
+    val all = listOf(dailyBack, strength, pilates, walking, neck, office, evening)
 
     fun find(key: String): PlanTemplate? = all.firstOrNull { it.key == key }
 
@@ -242,24 +296,23 @@ object SupplementTemplates {
     fun find(key: String?): SupplementTemplate? = all.firstOrNull { it.key == key }
 }
 
-/** Kleine Alltagstipps für einen gesunden Rücken, einer pro Tag. */
+/** Ein Tipp pro Tag – jeder beruht auf Leitlinien oder Studien aus [Evidence]. */
 object BackTips {
     val all = listOf(
-        "Steh alle 30 bis 45 Minuten kurz auf – Bewegung ist Nahrung für die Bandscheiben.",
-        "Heb schwere Dinge aus den Beinen: in die Knie gehen, Rücken gerade, Last nah am Körper.",
-        "Schon 10 Minuten Spazierengehen entlasten einen verspannten Rücken.",
-        "Bildschirm auf Augenhöhe – so bleibt dein Nacken entspannt.",
-        "Trag Taschen abwechselnd links und rechts oder nutze einen Rucksack.",
-        "Regelmäßig ist wichtiger als intensiv: lieber jeden Tag 10 Minuten als einmal pro Woche eine Stunde.",
-        "Achte beim Sitzen darauf, dass deine Füße flach auf dem Boden stehen.",
-        "Tief in den Bauch atmen entspannt auch die Rückenmuskulatur.",
-        "Beim Zähneputzen leicht in die Knie gehen – eine kleine Übung für zwischendurch.",
-        "Wechsle beim Arbeiten öfter die Position – die beste Haltung ist die nächste.",
-        "Ausreichend trinken hält die Bandscheiben elastisch.",
-        "Schlaf auf einer Matratze, auf der deine Wirbelsäule gerade liegt.",
-        "Starke Bauchmuskeln sind die beste Stütze für deinen Rücken.",
-        "Bei Schmerzen gilt: sanft bewegen statt komplett schonen – im Zweifel ärztlich abklären.",
-        "Telefonierst du? Steh dabei auf und geh ein paar Schritte.",
+        "Aktiv bleiben ist besser als schonen – Bettruhe verlängert Rückenschmerzen eher.",
+        "Die beste Übung ist die, die du regelmäßig machst. Such dir aus, was dir Freude macht.",
+        "Zügiges Gehen an fünf Tagen pro Woche kann den nächsten Rückfall deutlich hinauszögern.",
+        "Schon ein bis zwei Übungseinheiten pro Woche zeigen in Studien Wirkung.",
+        "Die meisten Rückenschmerz-Episoden sind harmlos und bessern sich innerhalb weniger Wochen.",
+        "Übungen beugen vor: Wer dranbleibt, hat seltener neue Rückenschmerzen.",
+        "Rückengurte und Schuheinlagen schützen laut Studien nicht vor Rückenschmerzen – Übungen schon.",
+        "Bei Nackenschmerzen helfen kräftigende Übungen mehr als Dehnen allein.",
+        "Pilates, Yoga, Kräftigung – alle wirken. Abwechslung ist erlaubt, wenn sie dir beim Dranbleiben hilft.",
+        "Stress und wenig Schlaf können Rückenschmerzen verstärken. Entspannung gehört mit dazu.",
+        "Röntgen oder MRT sind bei typischen Rückenschmerzen ohne Warnzeichen meist nicht nötig.",
+        "Bewegung im Alltag zählt mit: Treppe statt Aufzug, kurze Wege zu Fuß.",
+        "Regelmäßigkeit schlägt Intensität – lieber kurze Einheiten, die du durchhältst.",
+        "Taubheit im Gesäßbereich, Lähmungen oder Fieber? Dann bitte sofort ärztlich abklären lassen.",
         "Feiere kleine Erfolge – jede erledigte Einheit zählt.",
     )
 

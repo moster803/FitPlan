@@ -176,9 +176,15 @@ class SmokeTest {
         waitForText("Änderungen verwerfen?")
         compose.onNodeWithText("Verwerfen").performClick()
         compose.onNodeWithText("Übungsbibliothek").performClick()
-        waitForText("Katze-Kuh")
-        compose.onNodeWithText("Katze-Kuh").performClick()
+        waitForText("Tiefe Bauchmuskeln aktivieren")
+        compose.onNodeWithText("Tiefe Bauchmuskeln aktivieren").performClick()
+        waitForText("Wissenschaftliche Grundlage", substring = true)
         screenshot("15_bibliothek")
+        compose.onNodeWithText("Was sagt die Forschung?").performClick()
+        waitForText("Das Wichtigste in Kürze")
+        screenshot("15b_forschung")
+        back()
+        waitForText("Tiefe Bauchmuskeln aktivieren")
         back()
 
         // Supplements

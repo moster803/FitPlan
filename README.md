@@ -5,8 +5,9 @@ Eine Android-App (optimiert für Samsung-Handys mit One UI) für **tägliche Rü
 ## Funktionen
 
 ### Training
-- **Fertige Rückenpläne** als Vorlage: „Rücken täglich“ (≈ 12 Min), „Rücken-Kräftigung“ (Mo/Mi/Fr), „Büro-Pause“ (5 Min, werktags) und „Abend-Entspannung“.
-- **Übungsbibliothek** mit 22 Rückenübungen (Mobilisation, Kräftigung, Dehnung, Entspannung) – jeweils mit Schritt-für-Schritt-Anleitung und Tipp.
+- **Fertige Pläne** als Vorlage: „Rücken täglich“ (≈ 12 Min), „Rücken-Kräftigung“, „Pilates für den Rücken“, „Rücken-Spaziergang“ (nach der WalkBack-Studie), „Nacken & Schultern“, „Büro-Pause“ und „Abend-Entspannung“.
+- **Evidenzbasierte Übungsbibliothek** mit 40 Übungen aus acht Übungsformen, deren Wirkung bei Rücken- bzw. Nackenschmerzen in Studien belegt ist: Pilates, Stabilisation, Kräftigung, Yoga, Dehnung, McKenzie, Gehen sowie Nacken & Schultern. Jede Übung hat eine Schritt-für-Schritt-Anleitung, einen Tipp und ihre wissenschaftliche Grundlage mit Quellen-Links.
+- **„Was sagt die Forschung?“**: Kernaussagen aus Leitlinien und Studien, Übersicht der Übungsformen, Warnzeichen für einen Arztbesuch und alle Quellen.
 - **Eigene Übungen** anlegen, z. B. die aus der Physiotherapie.
 - **Plan-Editor**: Name, Symbol, Farbe, Trainingstage, Reihenfolge, Sätze, Wiederholungen oder Zeit, Pausen.
 - **Geführter Trainings-Player**: großer Countdown-Ring, automatische Pausen, Seitenwechsel bei einseitigen Übungen, Töne, Vibration und **deutsche Sprachansagen** – man muss beim Üben nicht aufs Handy schauen. Der Bildschirm bleibt an.
@@ -83,6 +84,22 @@ Bauen und testen:
 Jeder Push baut die App per GitHub Actions; ein Tag `v*` (z. B. `v1.0.0`) veröffentlicht die APK zusätzlich als Release.
 
 > Der mitgelieferte Signaturschlüssel (`app/signing/fitplan.jks`) ist nur für selbst installierte APKs gedacht. Für eine Veröffentlichung im Play Store einen eigenen, geheimen Schlüssel verwenden – und die Berechtigung `USE_EXACT_ALARM` prüfen, die Google nur Wecker- und Kalender-Apps erlaubt.
+
+## Wissenschaftliche Grundlage
+
+In die Bibliothek wurden nur Übungen aus Übungsformen aufgenommen, die in Leitlinien, Cochrane-Reviews oder großen randomisierten Studien untersucht wurden. Studien prüfen dabei meist ganze Übungsprogramme, nicht einzelne Übungen. Die wichtigsten Quellen:
+
+- Nationale VersorgungsLeitlinie Nicht-spezifischer Kreuzschmerz (2017) und NICE-Leitlinie NG59 – Bewegungstherapie als zentrale Behandlung, keine Bettruhe
+- Hayden et al. 2021, Cochrane – Übungstherapie bei chronischen Kreuzschmerzen (249 Studien)
+- Netzwerk-Metaanalysen: Hayden et al. 2021 (J Physiother), Owen et al. 2020 (BJSM), Fernández-Rodríguez et al. 2022 (JOSPT) – Pilates, Stabilisation und Kräftigung schneiden am besten ab
+- Cochrane-Reviews zu Pilates (Yamato 2015), Motorkontrolle (Saragiotto 2016) und Yoga (Wieland 2022)
+- Saper et al. 2017 und Sherman et al. 2011 – Yoga und Dehnprogramme
+- Lam et al. 2018 – McKenzie-Methode
+- Pocovi et al. 2024, The Lancet (WalkBack) – Gehen verzögert Rückfälle
+- Steffens et al. 2016, JAMA Intern Med – Übungen beugen Rückenschmerzen vor
+- Gross et al. 2015, Cochrane, und Andersen et al. 2008 – Kräftigung bei Nackenschmerzen
+
+Die vollständige Liste mit Links steht in der App und in `app/src/main/java/de/fitplan/app/core/library/Evidence.kt`.
 
 ## Hinweis
 

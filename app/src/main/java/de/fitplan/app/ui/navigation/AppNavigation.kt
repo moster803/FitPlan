@@ -34,6 +34,7 @@ import de.fitplan.app.MainActivity
 import de.fitplan.app.R
 import de.fitplan.app.core.model.AppData
 import de.fitplan.app.ui.LaunchRequest
+import de.fitplan.app.ui.evidence.EvidenceScreen
 import de.fitplan.app.ui.history.HistoryScreen
 import de.fitplan.app.ui.home.HomeScreen
 import de.fitplan.app.ui.player.PlayerScreen
@@ -55,7 +56,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object SettingsRoute
 
-@Serializable data object ExerciseLibraryRoute
+@Serializable data class ExerciseLibraryRoute(val filter: String? = null)
+
+@Serializable data object EvidenceRoute
 
 @Serializable data class PlanEditorRoute(val planId: String? = null, val templateKey: String? = null)
 
@@ -135,7 +138,8 @@ fun FitPlanNavHost(data: AppData, launchRequest: LaunchRequest?, onLaunchHandled
                     onStartPlan = { nav.navigate(PlayerRoute(it)) },
                     onEditPlan = { nav.navigate(PlanEditorRoute(planId = it)) },
                     onNewPlan = { nav.navigate(PlanEditorRoute(templateKey = it)) },
-                    onOpenLibrary = { nav.navigate(ExerciseLibraryRoute) },
+                    onOpenLibrary = { nav.navigate(ExerciseLibraryRoute()) },
+                    onOpenEvidence = { nav.navigate(EvidenceRoute) },
                 )
             }
             composable<SupplementsRoute> {
@@ -147,7 +151,20 @@ fun FitPlanNavHost(data: AppData, launchRequest: LaunchRequest?, onLaunchHandled
             }
             composable<HistoryRoute> { HistoryScreen(data = data) }
             composable<SettingsRoute> { SettingsScreen(data = data, onBack = { nav.popBackStack() }) }
-            composable<ExerciseLibraryRoute> { ExerciseLibraryScreen(data = data, onBack = { nav.popBackStack() }) }
+            composable<ExerciseLibraryRoute> { entry ->
+                ExerciseLibraryScreen(
+                    data = data,
+                    initialFilter = entry.toRoute<ExerciseLibraryRoute>().filter,
+                    onBack = { nav.popBackStack() },
+                    onOpenEvidence = { nav.navigate(EvidenceRoute) },
+                )
+            }
+            composable<EvidenceRoute> {
+                EvidenceScreen(
+                    onBack = { nav.popBackStack() },
+                    onShowExercises = { approach -> nav.navigate(ExerciseLibraryRoute(filter = approach.name)) },
+                )
+            }
             composable<PlanEditorRoute> { entry ->
                 val route = entry.toRoute<PlanEditorRoute>()
                 PlanEditorScreen(

@@ -388,7 +388,7 @@ private fun InstructionsCard(phase: Phase) {
                 Text(stringResource(R.string.player_how_to), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
                 Icon(if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, contentDescription = null)
             }
-            if (expanded) ExerciseDetails(phase.exercise)
+            if (expanded) ExerciseDetails(phase.exercise, showEvidence = false)
         }
     }
 }

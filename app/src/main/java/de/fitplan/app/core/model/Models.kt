@@ -7,7 +7,11 @@ val ALL_DAYS: Set<Int> = (1..7).toSet()
 val WEEKDAYS: Set<Int> = (1..5).toSet()
 
 @Serializable
-enum class ExerciseCategory { MOBILITY, STRENGTH, STRETCH, RELAX }
+enum class ExerciseCategory { MOBILITY, STRENGTH, STRETCH, RELAX, ENDURANCE }
+
+/** Übungsform, deren Wirksamkeit in Studien untersucht wurde – Grundlage für die Evidenz-Angaben. */
+@Serializable
+enum class Approach { PILATES, MOTOR_CONTROL, STRENGTH, YOGA, STRETCHING, MCKENZIE, WALKING, NECK }
 
 @Serializable
 enum class ExerciseMode { TIMED, REPS }
@@ -26,6 +30,10 @@ data class Exercise(
     /** Übung wird für linke und rechte Seite getrennt ausgeführt. */
     val perSide: Boolean = false,
     val builtIn: Boolean = false,
+    /** Studienbelegte Übungsform; eigene Übungen haben keine. */
+    val approach: Approach? = null,
+    /** Benötigte Hilfsmittel, leer wenn keine. */
+    val equipment: String = "",
 )
 
 @Serializable
