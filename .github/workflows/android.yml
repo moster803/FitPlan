@@ -105,6 +105,18 @@ jobs:
           disable-animations: true
           script: ./gradlew connectedDebugAndroidTest
 
+      - name: Screenshots ins Log schreiben
+        if: always()
+        run: |
+          # Verkleinerte Screenshots als Base64 ins Log, damit sie auch ohne Artefakt-Download prüfbar sind.
+          find app/build/outputs/connected_android_test_additional_output -name '*.png' 2>/dev/null | sort | while read -r f; do
+            name=$(basename "$f" .png)
+            convert "$f" -resize 360x -quality 70 "/tmp/$name.jpg" || continue
+            echo "SHOT-BEGIN $name"
+            base64 -w 4000 "/tmp/$name.jpg" | sed 's/^/SHOT /'
+            echo "SHOT-END $name"
+          done
+
       - name: Screenshots und Berichte hochladen
         if: always()
         uses: actions/upload-artifact@v5
