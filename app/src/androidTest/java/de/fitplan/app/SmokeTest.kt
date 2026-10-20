@@ -166,7 +166,7 @@ class SmokeTest {
         screenshot("13_plan_editor")
         back()
         waitForText("Übungsbibliothek")
-        compose.onNodeWithText("Neuer Plan").performClick()
+        compose.onNodeWithText("Neuer Plan", useUnmergedTree = true).performClick()
         waitForText("Neuen Plan erstellen")
         screenshot("14_vorlagen")
         compose.onNodeWithText("Büro-Pause").performClick()
