@@ -62,6 +62,13 @@ android {
         unitTests.isReturnDefaultValues = true
     }
 
+    lint {
+        // Befunde direkt im Build-Log ausgeben, damit CI-Fehler ohne Bericht-Download lesbar sind.
+        textReport = true
+        textOutput = file("stdout")
+        checkReleaseBuilds = false
+    }
+
     packaging.resources {
         excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
@@ -102,6 +109,8 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 
     androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.androidx.test.espresso.core)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.test.manifest)

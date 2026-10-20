@@ -1,6 +1,7 @@
 package de.fitplan.app.core
 
 import de.fitplan.app.core.logic.DayState
+import de.fitplan.app.core.logic.currentPlanStreak
 import de.fitplan.app.core.logic.currentStreak
 import de.fitplan.app.core.logic.dayState
 import de.fitplan.app.core.logic.longestStreak
@@ -74,6 +75,23 @@ class StatsTest {
         )
         assertEquals(6, data.longestStreak(MONDAY))
         assertEquals(1, data.currentStreak(MONDAY))
+    }
+
+    @Test
+    fun `plan streak only counts its own sessions`() {
+        val back = plan("back")
+        val office = plan("office", days = setOf(1, 2, 3, 4, 5))
+        val data = AppData(
+            plans = listOf(back, office),
+            sessions = listOf(
+                session(MONDAY.minusDays(1), planId = "back"),
+                session(MONDAY.minusDays(2), planId = "back"),
+                session(MONDAY.minusDays(3), planId = "office"), // Freitag
+            ),
+        )
+        assertEquals(2, data.currentPlanStreak(back, MONDAY))
+        // Wochenende zählt für den Büro-Plan nicht, Freitag war erledigt.
+        assertEquals(1, data.currentPlanStreak(office, MONDAY))
     }
 
     @Test

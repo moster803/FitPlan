@@ -1,0 +1,89 @@
+# FitPlan 🧘
+
+Eine Android-App (optimiert für Samsung-Handys mit One UI) für **tägliche Rückenübungen** und die **Planung von Nahrungsergänzungsmitteln** – mit zuverlässigen Erinnerungen, geführtem Training und Fortschrittsanzeige. Alle Daten bleiben auf dem Handy, es gibt kein Konto und keine Internetverbindung.
+
+## Funktionen
+
+### Training
+- **Fertige Rückenpläne** als Vorlage: „Rücken täglich“ (≈ 12 Min), „Rücken-Kräftigung“ (Mo/Mi/Fr), „Büro-Pause“ (5 Min, werktags) und „Abend-Entspannung“.
+- **Übungsbibliothek** mit 22 Rückenübungen (Mobilisation, Kräftigung, Dehnung, Entspannung) – jeweils mit Schritt-für-Schritt-Anleitung und Tipp.
+- **Eigene Übungen** anlegen, z. B. die aus der Physiotherapie.
+- **Plan-Editor**: Name, Symbol, Farbe, Trainingstage, Reihenfolge, Sätze, Wiederholungen oder Zeit, Pausen.
+- **Geführter Trainings-Player**: großer Countdown-Ring, automatische Pausen, Seitenwechsel bei einseitigen Übungen, Töne, Vibration und **deutsche Sprachansagen** – man muss beim Üben nicht aufs Handy schauen. Der Bildschirm bleibt an.
+- Nach dem Training: **„Wie fühlt sich dein Rücken an?“** (5 Stufen) – der Verlauf zeigt, wie sich das Rückengefühl entwickelt.
+- „Schon erledigt“ abhaken, z. B. nach der Physiotherapie-Stunde.
+
+### Erinnerungen
+- Pünktliche tägliche Erinnerung pro Plan, nur an den gewählten Tagen.
+- **Nachhaken**: Ist das Training abends noch offen, kommt eine zweite, sanfte Erinnerung.
+- Aktionen direkt in der Benachrichtigung: **Starten**, **In 30 Min**, **Schon erledigt**.
+- Erinnerungen werden nach Neustart, Zeitumstellung und App-Update automatisch neu geplant.
+- **Samsung-Hinweise** in Einrichtung und Einstellungen: Akku-Optimierung, „Nie schlafende Apps“ und eine Test-Benachrichtigung.
+
+### Supplements
+- **16 Vorlagen** (Vitamin D3, Magnesium, Omega-3, Zink, Eisen, B12, Kreatin …) mit üblichen Einnahmezeiten und Hinweisen.
+- Tageszeiten (morgens, mittags, abends, vor dem Schlafen) mit einstellbaren Uhrzeiten, Wochentage, Einnahme-Hinweis (zum Essen, nüchtern …).
+- **Eine gesammelte Erinnerung pro Tageszeit** mit Knopf „Alle genommen“ – sie bleibt stumm, wenn schon alles abgehakt ist.
+- **Vorratsverwaltung**: zählt bei jeder Einnahme herunter, zeigt „reicht noch ca. X Tage“ und warnt rechtzeitig vor dem Nachkaufen.
+- **Kur-Enddatum** für zeitlich begrenzte Einnahmen.
+- **Kombinations-Hinweise**, z. B. wenn Eisen und Calcium zur selben Tageszeit eingeplant sind.
+
+### Motivation & Überblick
+- **Serie (Streak)** und Wochenleiste auf der Startseite, Rekord-Serie.
+- **Verlauf**: Monatskalender, Statistik, Rückengefühl-Diagramm, Supplement-Einnahmequote.
+- **Homescreen-Widget** mit Serie, heutigem Training und Supplement-Fortschritt.
+- Tipp des Tages für einen gesunden Rücken.
+
+### Sonstiges
+- Hell-/Dunkelmodus, optional Farben vom Hintergrundbild (Material You).
+- **Backup** als Datei speichern und wiederherstellen (z. B. beim Handywechsel).
+
+## Installation auf dem Samsung-Handy
+
+1. Auf GitHub unter **Actions → Android-Build → letzter erfolgreicher Lauf** das Artefakt **FitPlan-apk** herunterladen und entpacken – oder, falls vorhanden, die `FitPlan.apk` unter **Releases** laden.
+2. Die `FitPlan.apk` auf dem Handy öffnen (z. B. über „Eigene Dateien“).
+3. Beim ersten Mal fragt Android nach der Erlaubnis **„Unbekannte Apps installieren“** für die App, mit der du die Datei öffnest – erlauben.
+4. Falls Google Play Protect warnt: **„Trotzdem installieren“**.
+5. FitPlan öffnen und den Einrichtungsassistenten durchgehen (Plan, Uhrzeit, Supplements, Erlaubnisse).
+
+**Updates:** Einfach die neue `FitPlan.apk` über die alte installieren – alle Daten bleiben erhalten, weil jede Version mit demselben Schlüssel signiert ist.
+
+### Damit Erinnerungen zuverlässig ankommen (Samsung)
+- Benachrichtigungen erlauben (fragt die App).
+- Akku-Optimierung für FitPlan ausschalten (Knopf in der App).
+- **Einstellungen › Akku › Hintergrundnutzungslimits › „Nie schlafende Apps“ › FitPlan hinzufügen.**
+- Mit **Einstellungen › Test-Benachrichtigung senden** prüfen, ob alles klappt.
+
+## Entwicklung
+
+- Kotlin, Jetpack Compose, Material 3, Navigation Compose, Glance (Widget)
+- Android Gradle Plugin 9.3, Kotlin 2.4, Gradle 9.5, minSdk 26 (Android 8), targetSdk 36
+- Daten als JSON-Datei im App-Speicher (atomar geschrieben), keine Netzwerkzugriffe
+
+```
+app/src/main/java/de/fitplan/app/
+├── core/          # reine Kotlin-Logik ohne Android – mit Unit-Tests
+│   ├── model/     # Datenmodell (Pläne, Übungen, Supplements, Verlauf)
+│   ├── data/      # Repository und Speicherung
+│   ├── logic/     # Serien, Statistiken, Erinnerungszeitplan, Vorrat
+│   ├── library/   # Übungsbibliothek und Vorlagen
+│   └── workout/   # Ablauf eines Trainings (Phasen, Timer-Zustand)
+├── reminders/     # AlarmManager, Benachrichtigungen, Receiver
+├── widget/        # Homescreen-Widget
+└── ui/            # Compose-Oberfläche
+```
+
+Bauen und testen:
+
+```bash
+./gradlew testDebugUnitTest   # Unit-Tests
+./gradlew assembleRelease     # signiertes APK unter app/build/outputs/apk/release/
+```
+
+Jeder Push baut die App per GitHub Actions; ein Tag `v*` (z. B. `v1.0.0`) veröffentlicht die APK zusätzlich als Release.
+
+> Der mitgelieferte Signaturschlüssel (`app/signing/fitplan.jks`) ist nur für selbst installierte APKs gedacht. Für eine Veröffentlichung im Play Store einen eigenen, geheimen Schlüssel verwenden – und die Berechtigung `USE_EXACT_ALARM` prüfen, die Google nur Wecker- und Kalender-Apps erlaubt.
+
+## Hinweis
+
+FitPlan ersetzt keine ärztliche oder physiotherapeutische Beratung. Bei Schmerzen Übungen abbrechen und ärztlich abklären lassen. Die Supplement-Hinweise sind allgemein gehalten – Fragen zu Dosierung und Wechselwirkungen bitte mit Ärztin, Arzt oder Apotheke klären.

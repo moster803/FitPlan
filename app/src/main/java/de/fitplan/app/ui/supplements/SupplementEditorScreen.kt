@@ -49,6 +49,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -77,7 +78,7 @@ import de.fitplan.app.ui.common.emoji
 import de.fitplan.app.ui.common.formatMinute
 import de.fitplan.app.ui.common.label
 import de.fitplan.app.ui.common.rememberToday
-import de.fitplan.app.ui.common.unitText
+import de.fitplan.app.ui.common.units
 import de.fitplan.app.ui.theme.ACCENT_COUNT
 import de.fitplan.app.ui.theme.FitTheme
 import java.time.LocalDate
@@ -371,6 +372,7 @@ fun SupplementEditorScreen(data: AppData, supplementId: String?, templateKey: St
 
 @Composable
 private fun StockCard(s: Supplement, onChange: ((Supplement) -> Supplement) -> Unit) {
+    val resources = LocalContext.current.resources
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
         modifier = Modifier.padding(top = 12.dp),
@@ -396,7 +398,7 @@ private fun StockCard(s: Supplement, onChange: ((Supplement) -> Supplement) -> U
                     value = s.unitsPerIntake,
                     onChange = { value -> onChange { it.copy(unitsPerIntake = value) } },
                     range = 1..500,
-                    format = { unitText(s.form, it) },
+                    format = { resources.getQuantityString(s.form.units, it, it) },
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     NumberField(
