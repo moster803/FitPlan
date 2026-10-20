@@ -124,7 +124,8 @@ class SmokeTest {
         compose.onNodeWithText("Starten").performClick()
         waitForText("Mach dich bereit")
         screenshot("07_player_bereit")
-        compose.onNodeWithText("Weiter").performClick()
+        // Die Vorbereitung läuft in Echtzeit ab – nur überspringen, wenn sie noch läuft.
+        if (exists("Weiter")) compose.onNodeWithText("Weiter").performClick()
         waitForText("Erledigt")
         screenshot("08_player_uebung")
         compose.onNodeWithText("Erledigt").performClick()
@@ -140,6 +141,7 @@ class SmokeTest {
         screenshot("10_geschafft")
         compose.onNodeWithText("Fertig").performClick()
         waitForText("Erledigt um", substring = true)
+        waitForText("🙂", substring = true)
         screenshot("11_heute_erledigt")
         val afterWorkout = runBlocking { app.repository.current() }
         assertEquals(1, afterWorkout.sessions.size)
