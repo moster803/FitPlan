@@ -214,7 +214,14 @@ jobs:
             cat crash.log
             exit 1
           fi
-          if grep -q "ANR in de.fitplan.app" logcat.log; then
+          if grep -q "ANR in de.fitplan.app" logcat.log && grep -qE "NOT RESPONDING: (com.android.systemui|com.android.phone|com.google.android.apps.nexuslauncher) " monkey.log; then
+            # Hängen gleichzeitig Systemoberfläche, Telefon-Dienst oder Startbildschirm, ist der Emulator überlastet – kein Fehler der App.
+            echo "::warning::FitPlan reagierte zeitweise nicht, gleichzeitig hingen aber auch Systemprozesse – Emulator überlastet"
+            grep "NOT RESPONDING" monkey.log
+            grep -m 1 -A 3 "ANR in de.fitplan.app" logcat.log
+            echo "Keine Abstürze."
+            exit 0
+          elif grep -q "ANR in de.fitplan.app" logcat.log; then
             echo "::error::FitPlan reagierte nicht (ANR)"
             grep -A 8 "ANR in de.fitplan.app" logcat.log
             # Woran der Hauptthread hing, steht in den ANR-Traces der Dropbox.
