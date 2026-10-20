@@ -1,4 +1,446 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">FitPlan</string>
+
+    <!-- Allgemein -->
+    <string name="add">Hinzufügen</string>
+    <string name="back">Zurück</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="close">Schließen</string>
+    <string name="delete">Löschen</string>
+    <string name="discard">Verwerfen</string>
+    <string name="discard_title">Änderungen verwerfen?</string>
+    <string name="discard_text">Deine Änderungen wurden noch nicht gespeichert.</string>
+    <string name="done">Fertig</string>
+    <string name="edit">Bearbeiten</string>
+    <string name="next">Weiter</string>
+    <string name="off">Aus</string>
+    <string name="ok">OK</string>
+    <string name="paused">Pausiert</string>
+    <string name="save">Speichern</string>
+    <string name="show_all">Alle anzeigen</string>
+    <string name="start">Starten</string>
+    <string name="today">Heute</string>
+    <string name="undo">Rückgängig</string>
+    <string name="percent">%1$d %%</string>
+    <string name="minutes_short">%1$d Min</string>
+    <string name="pick_time">Uhrzeit wählen</string>
+    <string name="cd_decrease">Weniger</string>
+    <string name="cd_increase">Mehr</string>
+    <string name="move_up">Nach oben</string>
+    <string name="move_down">Nach unten</string>
+    <string name="filter_all">Alle</string>
+    <string name="unknown_exercise">Unbekannte Übung</string>
+    <string name="deleted_plan">Gelöschter Plan</string>
+
+    <!-- Navigation -->
+    <string name="tab_today">Heute</string>
+    <string name="tab_training">Training</string>
+    <string name="tab_supplements">Supplements</string>
+    <string name="tab_history">Verlauf</string>
+
+    <!-- Wochentage, Index 0 = Montag -->
+    <string-array name="weekday_short">
+        <item>Mo</item>
+        <item>Di</item>
+        <item>Mi</item>
+        <item>Do</item>
+        <item>Fr</item>
+        <item>Sa</item>
+        <item>So</item>
+    </string-array>
+    <string name="days_daily">Täglich</string>
+    <string name="days_weekdays">Werktags</string>
+    <string name="days_weekend">Wochenende</string>
+    <string name="days_none">Keine Tage</string>
+    <plurals name="days_count">
+        <item quantity="one">%d Tag</item>
+        <item quantity="other">%d Tage</item>
+    </plurals>
+
+    <!-- Tageszeiten & Einnahme -->
+    <string name="slot_morning">Morgens</string>
+    <string name="slot_noon">Mittags</string>
+    <string name="slot_evening">Abends</string>
+    <string name="slot_night">Vor dem Schlafen</string>
+    <string name="hint_any">Egal wann</string>
+    <string name="hint_with_meal">Zum Essen</string>
+    <string name="hint_empty_stomach">Nüchtern</string>
+    <string name="hint_before_bed">Vor dem Schlafen</string>
+    <string name="form_capsule">Kapsel</string>
+    <string name="form_tablet">Tablette</string>
+    <string name="form_powder">Pulver</string>
+    <string name="form_drops">Tropfen</string>
+    <string name="form_liquid">Flüssig</string>
+    <string name="form_gummy">Gummy</string>
+    <plurals name="unit_capsule">
+        <item quantity="one">%d Kapsel</item>
+        <item quantity="other">%d Kapseln</item>
+    </plurals>
+    <plurals name="unit_tablet">
+        <item quantity="one">%d Tablette</item>
+        <item quantity="other">%d Tabletten</item>
+    </plurals>
+    <plurals name="unit_gram">
+        <item quantity="one">%d g</item>
+        <item quantity="other">%d g</item>
+    </plurals>
+    <plurals name="unit_drop">
+        <item quantity="one">%d Tropfen</item>
+        <item quantity="other">%d Tropfen</item>
+    </plurals>
+    <plurals name="unit_ml">
+        <item quantity="one">%d ml</item>
+        <item quantity="other">%d ml</item>
+    </plurals>
+    <plurals name="unit_gummy">
+        <item quantity="one">%d Gummy</item>
+        <item quantity="other">%d Gummies</item>
+    </plurals>
+
+    <!-- Übungen -->
+    <string name="category_mobility">Mobilisation</string>
+    <string name="category_strength">Kräftigung</string>
+    <string name="category_stretch">Dehnung</string>
+    <string name="category_relax">Entspannung</string>
+    <string name="mode_reps">Wiederholungen</string>
+    <string name="mode_timed">Zeit</string>
+    <string name="step_reps">%1$d Wdh.</string>
+    <string name="step_seconds">%1$d s</string>
+    <string name="per_side">je Seite</string>
+    <string name="rest_short">%1$d s Pause</string>
+    <string name="exercise_new">Eigene Übung</string>
+    <string name="exercise_edit">Übung bearbeiten</string>
+    <string name="exercise_delete_title">Übung löschen?</string>
+    <string name="exercise_delete_text">„%1$s“ wird gelöscht und aus allen Plänen entfernt.</string>
+    <string name="exercise_disclaimer">Bei Schmerzen die Übung abbrechen. Die Übungen ersetzen keine ärztliche oder physiotherapeutische Beratung – eigene Übungen aus der Physiotherapie kannst du in der Übungsbibliothek anlegen.</string>
+    <string name="library_title">Übungsbibliothek</string>
+    <string name="library_subtitle">%1$d Übungen mit Anleitungen und Tipps</string>
+    <string name="search_exercises">Übung suchen</string>
+
+    <!-- Formularfelder -->
+    <string name="field_name">Name</string>
+    <string name="field_description">Kurzbeschreibung</string>
+    <string name="field_category">Kategorie</string>
+    <string name="field_seconds">Sekunden</string>
+    <string name="field_duration">Dauer</string>
+    <string name="field_sets">Sätze</string>
+    <string name="field_rest">Pause danach</string>
+    <string name="field_per_side">Für jede Seite einzeln</string>
+    <string name="field_steps">Anleitung</string>
+    <string name="field_steps_hint">Ein Schritt pro Zeile</string>
+    <string name="field_tip">Tipp (optional)</string>
+    <string name="field_plan_name">Name des Plans</string>
+    <string name="field_plan_name_hint">z. B. Rücken morgens</string>
+    <string name="field_icon">Symbol</string>
+    <string name="field_color">Farbe</string>
+    <string name="field_days">Tage</string>
+    <string name="field_form">Darreichungsform</string>
+    <string name="field_slots">Einnahmezeiten</string>
+    <string name="field_slots_required">Wähle mindestens eine Tageszeit.</string>
+    <string name="field_hint">Einnahme-Hinweis</string>
+    <string name="field_dose">Dosis</string>
+    <string name="field_dose_hint">z. B. 1000 IE oder 1 Kapsel</string>
+    <string name="field_supplement_name_hint">z. B. Vitamin D3</string>
+    <string name="field_notes">Notizen (optional)</string>
+
+    <!-- Heute -->
+    <string name="greeting_morning">Guten Morgen</string>
+    <string name="greeting_day">Hallo</string>
+    <string name="greeting_evening">Guten Abend</string>
+    <string name="greeting_night">Gute Nacht</string>
+    <string name="greeting_named">%1$s, %2$s!</string>
+    <string name="greeting_plain">%1$s!</string>
+    <plurals name="streak_days">
+        <item quantity="one">%d Tag in Folge</item>
+        <item quantity="other">%d Tage in Folge</item>
+    </plurals>
+    <string name="streak_start">Heute ist ein guter Tag, um deine Serie zu starten.</string>
+    <string name="streak_keep_going">Halte deine Serie – heute fehlt noch dein Training.</string>
+    <string name="streak_today_done">Stark! Heute schon erledigt 💪</string>
+    <string name="streak_record">Rekord</string>
+    <string name="home_training_today">Training heute</string>
+    <string name="home_no_plan_title">Noch kein Trainingsplan</string>
+    <string name="home_no_plan_text">Erstelle deinen ersten Plan – zum Beispiel die tägliche Rücken-Routine.</string>
+    <string name="home_create_plan">Plan erstellen</string>
+    <string name="home_rest_day_title">Heute ist Ruhetag</string>
+    <string name="home_rest_day_text">Gönn deinem Rücken eine Pause – oder trainiere trotzdem eine Runde.</string>
+    <string name="home_choose_workout">Training auswählen</string>
+    <string name="home_done_at">Erledigt um %1$s</string>
+    <string name="home_again">Nochmal</string>
+    <string name="home_already_done">Schon erledigt</string>
+    <string name="home_supplements_today">Supplements heute</string>
+    <string name="home_no_supplements_title">Nahrungsergänzung planen</string>
+    <string name="home_no_supplements_text">Lass dich an Vitamine, Mineralstoffe &amp; Co. erinnern und behalte deinen Vorrat im Blick.</string>
+    <string name="home_no_supplements_due">Heute stehen keine Supplements an.</string>
+    <string name="home_tip_title">Tipp des Tages</string>
+    <string name="plan_meta">ca. %1$d Min · %2$d Übungen</string>
+    <string name="all_taken">Alles genommen</string>
+    <string name="take_all">Alle ✓</string>
+    <string name="low_stock_title">Bald nachkaufen</string>
+
+    <!-- Pläne -->
+    <string name="plans_title">Training</string>
+    <string name="plans_new">Neuer Plan</string>
+    <string name="plans_new_title">Neuen Plan erstellen</string>
+    <string name="plans_empty_title">Noch keine Pläne</string>
+    <string name="plans_empty_text">Starte mit einer Vorlage und passe sie an – oder baue deinen Plan aus der Übungsbibliothek selbst zusammen.</string>
+    <string name="plans_choose_template">Vorlage wählen</string>
+    <string name="plans_blank">Leerer Plan</string>
+    <string name="plans_blank_text">Übungen selbst zusammenstellen, z. B. aus der Physiotherapie.</string>
+    <string name="plan_new_title">Neuer Plan</string>
+    <string name="plan_edit_title">Plan bearbeiten</string>
+    <string name="plan_exercises_header">Übungen (%1$d) · ca. %2$d Min</string>
+    <string name="plan_add_exercise">Übung hinzufügen</string>
+    <string name="plan_active">Plan aktiv</string>
+    <string name="plan_active_hint">Pausierte Pläne erinnern nicht und zählen nicht für die Serie.</string>
+    <string name="plan_delete">Plan löschen</string>
+    <string name="plan_delete_text">„%1$s“ wird gelöscht. Bereits absolvierte Einheiten bleiben im Verlauf erhalten.</string>
+    <string name="reminder">Erinnerung</string>
+    <string name="reminder_time">Uhrzeit</string>
+    <string name="reminder_followup">Nachhaken</string>
+    <string name="reminder_followup_hint">Erinnert noch einmal, falls du bis dahin nicht trainiert hast.</string>
+    <string name="reminder_followup_time">Zweite Erinnerung um</string>
+    <string name="reminder_followup_invalid">Die zweite Erinnerung muss nach der ersten liegen.</string>
+
+    <!-- Training-Player -->
+    <string name="phase_get_ready">Mach dich bereit</string>
+    <string name="phase_work">Los geht\'s</string>
+    <string name="phase_switch">Seite wechseln</string>
+    <string name="phase_rest">Pause</string>
+    <string name="player_exercise_of">Übung %1$d von %2$d</string>
+    <string name="player_set_of">Satz %1$d von %2$d</string>
+    <string name="player_coming_up">Gleich</string>
+    <string name="side_left">Linke Seite</string>
+    <string name="side_right">Rechte Seite</string>
+    <string name="player_seconds">Sekunden</string>
+    <string name="player_paused">Pausiert</string>
+    <plurals name="player_reps_label">
+        <item quantity="one">Wiederholung</item>
+        <item quantity="other">Wiederholungen</item>
+    </plurals>
+    <string name="player_reps_done">Erledigt</string>
+    <string name="player_plus_10">+10 s</string>
+    <string name="player_skip_rest">Weiter</string>
+    <string name="player_how_to">So geht\'s</string>
+    <string name="player_next">Als Nächstes: %1$s</string>
+    <string name="player_previous">Zurück</string>
+    <string name="player_pause">Pause</string>
+    <string name="player_resume">Fortsetzen</string>
+    <string name="player_skip">Überspringen</string>
+    <string name="player_quit_title">Training beenden?</string>
+    <string name="player_quit_text">Du hast %1$d von %2$d Übungen geschafft.</string>
+    <string name="player_save_quit">Speichern</string>
+    <string name="player_continue">Weitermachen</string>
+    <string name="player_missing_title">Nichts zu trainieren</string>
+    <string name="player_missing_text">Dieser Plan existiert nicht mehr oder enthält keine Übungen.</string>
+    <string name="summary_title">Geschafft!</string>
+    <string name="summary_title_skipped">Training beendet</string>
+    <string name="summary_subtitle">Dein Rücken sagt danke.</string>
+    <string name="summary_duration">Dauer</string>
+    <string name="summary_exercises">Übungen</string>
+    <string name="summary_streak">Serie</string>
+    <string name="summary_feeling_question">Wie fühlt sich dein Rücken jetzt an?</string>
+    <string name="summary_pain_title">Pass gut auf dich auf</string>
+    <string name="summary_pain_text">Wenn Schmerzen anhalten oder stärker werden, sprich bitte mit deiner Ärztin, deinem Arzt oder deiner Physiotherapie.</string>
+    <string name="feeling_1">Schmerzt</string>
+    <string name="feeling_2">Verspannt</string>
+    <string name="feeling_3">Okay</string>
+    <string name="feeling_4">Gut</string>
+    <string name="feeling_5">Super</string>
+
+    <!-- Sprachansagen -->
+    <string name="tts_get_ready">Mach dich bereit. Als Erstes: %1$s.</string>
+    <string name="tts_work">%1$s. %2$s.</string>
+    <string name="tts_work_left">%1$s, linke Seite. %2$s.</string>
+    <string name="tts_work_right">Rechte Seite. %1$s.</string>
+    <string name="tts_switch_side">Seite wechseln.</string>
+    <string name="tts_rest_next">Pause. Als Nächstes: %1$s.</string>
+    <string name="tts_rest_next_set">Pause. Gleich kommt Satz %1$d.</string>
+    <string name="tts_finished">Geschafft! Super gemacht.</string>
+    <plurals name="tts_seconds">
+        <item quantity="one">%d Sekunde</item>
+        <item quantity="other">%d Sekunden</item>
+    </plurals>
+    <plurals name="tts_reps">
+        <item quantity="one">%d Wiederholung</item>
+        <item quantity="other">%d Wiederholungen</item>
+    </plurals>
+
+    <!-- Supplements -->
+    <string name="supplements_title">Supplements</string>
+    <string name="supplements_empty_title">Noch keine Supplements</string>
+    <string name="supplements_empty_text">Plane Vitamine, Mineralstoffe &amp; Co. – FitPlan erinnert dich zur richtigen Tageszeit und behält deinen Vorrat im Blick.</string>
+    <string name="supplement_add">Supplement hinzufügen</string>
+    <string name="supplement_custom">Eigenes</string>
+    <string name="supplement_template_title">Was möchtest du einplanen?</string>
+    <string name="supplement_template_text">Vorlagen enthalten übliche Einnahmezeiten – du kannst alles anpassen.</string>
+    <string name="supplement_new_title">Neues Supplement</string>
+    <string name="supplement_edit_title">Supplement bearbeiten</string>
+    <string name="supplement_tip_title">Gut zu wissen</string>
+    <string name="supplement_active">Aktiv</string>
+    <string name="supplement_active_hint">Pausierte Supplements erscheinen nicht in der Tagesliste.</string>
+    <string name="supplement_delete">Supplement löschen</string>
+    <string name="supplement_delete_text">„%1$s“ und alle Einnahmen werden gelöscht.</string>
+    <string name="supplement_disclaimer">Allgemeine Hinweise, keine medizinische Beratung. Bei Fragen zu Dosierung und Wechselwirkungen hilft deine Ärztin, dein Arzt oder die Apotheke.</string>
+    <string name="adherence_title">Diese Woche eingenommen</string>
+    <string name="adherence_subtitle">Antippen für Details pro Tag</string>
+    <string name="chart_intake_detail">%1$s: %2$d von %3$d genommen</string>
+    <string name="chart_no_intake">%1$s: nichts fällig</string>
+    <string name="hint_title">%1$s + %2$s (%3$s)</string>
+    <string name="course_title">Als Kur begrenzen</string>
+    <string name="course_text">Nach dem Enddatum wird das Supplement nicht mehr eingeplant.</string>
+    <string name="course_until">bis %1$s</string>
+    <string name="course_ended">Kur beendet</string>
+    <string name="stock_title">Vorrat verfolgen</string>
+    <string name="stock_text">Zählt bei jeder Einnahme herunter und warnt rechtzeitig.</string>
+    <string name="stock_per_intake">Pro Einnahme</string>
+    <string name="stock_current">Aktueller Vorrat</string>
+    <string name="stock_pack_size">Packungsgröße</string>
+    <string name="stock_warn_days">Warnen ab Tagen Restvorrat</string>
+    <plurals name="stock_days_left">
+        <item quantity="one">reicht ca. %d Tag</item>
+        <item quantity="other">reicht ca. %d Tage</item>
+    </plurals>
+    <string name="refill">+%1$d auffüllen</string>
+    <string name="slot_times_title">Einnahmezeiten</string>
+    <string name="slot_times_text">Zu diesen Uhrzeiten erinnert dich FitPlan – gesammelt für alle Supplements der Tageszeit.</string>
+    <string name="slot_times_info_title">Schon genommen?</string>
+    <string name="slot_times_info_text">Hast du alles abgehakt, bleibt die Erinnerung für diese Tageszeit stumm.</string>
+    <string name="supplement_reminders">Supplement-Erinnerungen</string>
+    <string name="supplement_reminders_text">Eine Benachrichtigung pro Tageszeit mit „Alle genommen“-Knopf.</string>
+    <string name="low_stock_alerts">Vorrats-Warnungen</string>
+    <string name="low_stock_alerts_text">Benachrichtigung, wenn ein Vorrat zur Neige geht.</string>
+
+    <!-- Verlauf -->
+    <string name="history_title">Verlauf</string>
+    <string name="history_recent">Letzte Einheiten</string>
+    <string name="history_empty_title">Noch keine Einheiten</string>
+    <string name="history_empty_text">Nach deinem ersten Training siehst du hier deine Fortschritte.</string>
+    <string name="stat_streak">Aktuelle Serie</string>
+    <string name="stat_best_streak">Längste Serie</string>
+    <string name="stat_month_sessions">Einheiten diesen Monat</string>
+    <string name="stat_total_minutes">Minuten gesamt</string>
+    <string name="previous_month">Vorheriger Monat</string>
+    <string name="next_month">Nächster Monat</string>
+    <string name="legend_done">Trainiert</string>
+    <string name="legend_missed">Verpasst</string>
+    <string name="legend_supplements_complete">Supplements komplett</string>
+    <string name="legend_supplements_partial">teilweise</string>
+    <string name="feeling_chart_title">Rückengefühl</string>
+    <string name="feeling_chart_empty">Bewerte nach dem Training, wie sich dein Rücken anfühlt – hier siehst du dann, wie es sich über die Wochen entwickelt.</string>
+    <string name="feeling_average">Ø %1$s %2$s in den letzten 30 Tagen · Punkte antippen für Details</string>
+    <string name="supplement_trend_title">Supplements · 14 Tage</string>
+    <string name="supplement_trend_text">Anteil der genommenen Einnahmen pro Tag</string>
+    <string name="session_detail">%1$s, %2$s · %3$d Min · %4$d/%5$d Übungen</string>
+    <string name="session_quick">%1$s, %2$s · abgehakt</string>
+    <string name="session_delete_title">Eintrag löschen?</string>
+    <string name="session_delete_text">Die Einheit wird aus deinem Verlauf entfernt und zählt nicht mehr für die Serie.</string>
+
+    <!-- Einstellungen -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_name">Dein Name</string>
+    <string name="settings_name_empty">Nicht festgelegt</string>
+    <string name="settings_reminders">Erinnerungen</string>
+    <string name="settings_training">Training</string>
+    <string name="settings_appearance">Darstellung</string>
+    <string name="settings_data">Daten</string>
+    <string name="settings_about">Über FitPlan</string>
+    <string name="perm_notifications">Benachrichtigungen</string>
+    <string name="perm_notifications_text">Ohne diese Erlaubnis kann FitPlan dich nicht erinnern.</string>
+    <string name="perm_exact">Pünktliche Erinnerungen</string>
+    <string name="perm_exact_text">Erlaubt „Wecker &amp; Erinnerungen“, damit Hinweise auf die Minute genau kommen.</string>
+    <string name="perm_battery">Akku-Optimierung</string>
+    <string name="perm_battery_text">Nimm FitPlan von der Akku-Optimierung aus, damit Erinnerungen nicht verschluckt werden.</string>
+    <string name="perm_ok">Alles bereit ✓</string>
+    <string name="perm_fix">Erlauben</string>
+    <string name="samsung_title">Tipp für Samsung-Handys</string>
+    <string name="samsung_text">Einstellungen › Akku › Hintergrundnutzungslimits › „Nie schlafende Apps“ › FitPlan hinzufügen. So stellt One UI die App nie in den Tiefschlaf und Erinnerungen kommen zuverlässig.</string>
+    <string name="test_notification">Test-Benachrichtigung senden</string>
+    <string name="test_notification_text">Prüfe, ob Erinnerungen bei dir ankommen.</string>
+    <string name="test_blocked">Benachrichtigungen sind noch nicht erlaubt.</string>
+    <string name="setting_sound">Töne</string>
+    <string name="setting_sound_text">Countdown-Piepen in den letzten Sekunden</string>
+    <string name="setting_vibration">Vibration</string>
+    <string name="setting_voice">Sprachansagen</string>
+    <string name="setting_voice_text">Sagt Übung, Dauer und Seitenwechsel an – du musst nicht aufs Handy schauen.</string>
+    <string name="setting_get_ready">Vorbereitungszeit vor dem Start</string>
+    <string name="setting_theme">Design</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Hell</string>
+    <string name="theme_dark">Dunkel</string>
+    <string name="setting_dynamic">Farben vom Hintergrundbild</string>
+    <string name="setting_dynamic_text">Übernimmt die Farbpalette deines Handys (Material You).</string>
+    <string name="backup_export">Backup speichern</string>
+    <string name="backup_export_text">Alle Pläne, Supplements und den Verlauf als Datei sichern, z. B. für ein neues Handy.</string>
+    <string name="backup_import">Backup wiederherstellen</string>
+    <string name="backup_import_text">Daten aus einer Backup-Datei laden.</string>
+    <string name="backup_import_confirm">Alle aktuellen Daten werden durch das Backup ersetzt.</string>
+    <string name="backup_import_action">Wiederherstellen</string>
+    <string name="backup_saved">Backup gespeichert</string>
+    <string name="backup_imported">Backup wiederhergestellt</string>
+    <string name="backup_failed">Das hat leider nicht geklappt.</string>
+    <string name="reset_all">Alle Daten löschen</string>
+    <string name="reset_all_text">Setzt die App auf den Anfangszustand zurück.</string>
+    <string name="reset_all_confirm">Pläne, Supplements und der komplette Verlauf werden unwiderruflich gelöscht.</string>
+    <string name="reset_all_action">Alles löschen</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_text">Deine Daten bleiben auf deinem Handy – FitPlan braucht weder Konto noch Internet.</string>
+    <string name="about_disclaimer">FitPlan ersetzt keine ärztliche oder physiotherapeutische Beratung. Bei Schmerzen Übungen abbrechen und ärztlich abklären lassen.</string>
+
+    <!-- Einrichtung -->
+    <string name="onboarding_welcome_title">Willkommen bei FitPlan</string>
+    <string name="onboarding_welcome_text">Dein Begleiter für einen starken Rücken – in wenigen Minuten am Tag.</string>
+    <string name="onboarding_feature_plans">Geführte Trainingspläne mit Timer und Sprachansagen</string>
+    <string name="onboarding_feature_reminders">Tägliche Erinnerungen – mit Nachhaken, falls du es vergisst</string>
+    <string name="onboarding_feature_supplements">Supplement-Planer mit Vorratsanzeige</string>
+    <string name="onboarding_feature_streaks">Serien und Verlauf, die motivieren</string>
+    <string name="onboarding_name">Wie dürfen wir dich nennen? (optional)</string>
+    <string name="onboarding_start">Los geht\'s</string>
+    <string name="onboarding_training_title">Dein Training</string>
+    <string name="onboarding_training_text">Wähle einen oder mehrere Pläne. Du kannst sie jederzeit anpassen oder eigene Übungen ergänzen.</string>
+    <string name="onboarding_time_title">Wann soll FitPlan dich erinnern?</string>
+    <string name="onboarding_time_text">Gilt für den ersten ausgewählten Plan. Abends hakt FitPlan nach, falls du noch nicht trainiert hast.</string>
+    <string name="onboarding_other_time">Andere Uhrzeit…</string>
+    <string name="onboarding_supplements_title">Nimmst du Nahrungsergänzung?</string>
+    <string name="onboarding_supplements_text">Tippe an, was du einplanen möchtest. Dosis, Uhrzeit und Vorrat lassen sich später anpassen – oder überspring diesen Schritt.</string>
+    <string name="onboarding_reminders_title">Damit Erinnerungen ankommen</string>
+    <string name="onboarding_reminders_text">Android und besonders Samsung-Handys sparen gern Akku, indem sie Apps schlafen legen. Mit diesen Einstellungen kommen deine Erinnerungen zuverlässig an.</string>
+    <string name="onboarding_finish">Fertig</string>
+
+    <!-- Benachrichtigungen -->
+    <string name="channel_workout">Training</string>
+    <string name="channel_workout_desc">Erinnerungen an deine Trainingspläne</string>
+    <string name="channel_supplements">Supplements</string>
+    <string name="channel_supplements_desc">Erinnerungen an deine Nahrungsergänzung</string>
+    <string name="channel_stock">Vorrat</string>
+    <string name="channel_stock_desc">Hinweise, wenn ein Vorrat zur Neige geht</string>
+    <string name="notif_workout_title">Zeit für deinen Rücken %1$s</string>
+    <string name="notif_workout_followup_title">Noch nicht trainiert? Ein paar Minuten reichen.</string>
+    <string name="notif_workout_text">%1$s · ca. %2$d Min · %3$d Übungen</string>
+    <string name="notif_streak">🔥 Serie: %1$d</string>
+    <string name="notif_action_start">Starten</string>
+    <string name="notif_action_snooze">In 30 Min</string>
+    <string name="notif_action_done">Schon erledigt</string>
+    <string name="notif_action_take_all">Alle genommen</string>
+    <string name="notif_supplements_title">Supplements · %1$s</string>
+    <string name="notif_stock_title">%1$s %2$s wird knapp</string>
+    <plurals name="notif_stock_text">
+        <item quantity="one">Reicht noch etwa %d Tag – Zeit nachzukaufen.</item>
+        <item quantity="other">Reicht noch etwa %d Tage – Zeit nachzukaufen.</item>
+    </plurals>
+    <string name="notif_test_title">Es funktioniert! 🎉</string>
+    <string name="notif_test_text">So sehen deine Erinnerungen aus.</string>
+
+    <!-- Widget -->
+    <string name="widget_name">FitPlan Heute</string>
+    <string name="widget_description">Serie, heutiges Training und Supplements auf einen Blick</string>
+    <plurals name="widget_streak_label">
+        <item quantity="one">Tag in Folge</item>
+        <item quantity="other">Tage in Folge</item>
+    </plurals>
+    <string name="widget_rest_day">🌿 Heute Ruhetag</string>
+    <string name="widget_training_done">✅ Training erledigt</string>
+    <string name="widget_training_open">%1$s %2$s – jetzt starten</string>
+    <string name="widget_supplements">💊 %1$d/%2$d Supplements</string>
 </resources>
