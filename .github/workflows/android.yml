@@ -116,8 +116,10 @@ jobs:
           ram-size: 3072M
           disk-size: 4096M
           disable-animations: true
+          # Ist der Emulator beim Teststart nicht erreichbar (Störung bei GitHub, kein Testfehler), gibt es genau einen zweiten Versuch.
           script: |
-            ./gradlew connectedDebugAndroidTest || touch ui-test-failed
+            (./gradlew connectedDebugAndroidTest || touch ui-test-failed) 2>&1 | tee ui-test.log
+            if grep -q "No compatible devices connected" ui-test.log; then echo "Emulator nicht erreichbar - zweiter Versuch"; adb kill-server; adb start-server; timeout 180 sh -c 'until adb shell getprop sys.boot_completed 2>/dev/null | grep -q 1; do sleep 3; done' || true; rm -f ui-test-failed; ./gradlew connectedDebugAndroidTest || touch ui-test-failed; fi
             mkdir -p device-screenshots
             adb shell ls -R /sdcard/Android/media/de.fitplan.app.debug /sdcard/Android/data/de.fitplan.app.debug/files || true
             adb pull /sdcard/Android/media/de.fitplan.app.debug device-screenshots/media || true
