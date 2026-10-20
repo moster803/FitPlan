@@ -81,10 +81,11 @@ Bauen und testen:
 ./gradlew assembleRelease     # signiertes APK unter app/build/outputs/apk/release/
 ```
 
-Jeder Push baut die App per GitHub Actions. Ein Release entsteht auf einem dieser Wege:
-- **Actions › Android-Build › „Run workflow“** und bei „Als Release veröffentlichen“ die Version eintragen (z. B. `v1.1.0`),
-- unter **Releases › „Draft a new release“** einen neuen Tag `v*` anlegen und veröffentlichen,
-- oder einen Tag `v*` per `git push` hochladen.
+Jeder Push baut und testet die App per GitHub Actions (Unit-Tests, Lint, UI-Test im Emulator). Ein Release entsteht, sobald alles grün ist, auf einem dieser Wege:
+- **automatisch**, wenn auf dem Standard-Branch eine neue `versionName` steht (in `app/build.gradle.kts`, dazu `versionCode` erhöhen und `.github/release-notes.md` anpassen),
+- über **Actions › Android-Build › „Run workflow“** mit der Version im Feld „Als Release veröffentlichen“ (z. B. `v1.1.0`),
+- unter **Releases › „Draft a new release“** mit einem neuen Tag `v*`,
+- oder mit einem per `git push` hochgeladenen Tag `v*`.
 
 Der Workflow hängt dann die `FitPlan.apk` an und übernimmt die Beschreibung aus `.github/release-notes.md`.
 

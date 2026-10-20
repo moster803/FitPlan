@@ -15,6 +15,7 @@ on:
         default: ""
 
 # Ein auf GitHub angelegtes Release löst „release“ und „push“ (Tag) aus; über die Gruppe läuft nur einer davon zu Ende.
+# Ein Push auf den Standard-Branch mit neuer versionName (noch ohne Tag v<versionName>) veröffentlicht das Release automatisch.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -24,8 +25,6 @@ jobs:
     name: Testen & APK bauen
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v5
 
@@ -67,17 +66,6 @@ jobs:
             app/build/reports/
             app/build/test-results/
           if-no-files-found: ignore
-
-      - name: Release veröffentlichen
-        if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.release != '')
-        uses: softprops/action-gh-release@v2
-        with:
-          # Bei manuellem Start legt die Action den Tag auf dem gebauten Commit an.
-          tag_name: ${{ inputs.release || github.ref_name }}
-          target_commitish: ${{ github.sha }}
-          name: FitPlan ${{ inputs.release || github.ref_name }}
-          body_path: .github/release-notes.md
-          files: dist/FitPlan.apk
 
   ui-test:
     name: UI-Test im Emulator
@@ -156,3 +144,51 @@ jobs:
             app/build/reports/androidTests/
             app/build/outputs/androidTest-results/
           if-no-files-found: ignore
+
+  release:
+    name: Release veröffentlichen
+    needs: [build, ui-test]
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Version bestimmen
+        id: version
+        env:
+          INPUT_RELEASE: ${{ inputs.release }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          tag=""
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            tag="$GITHUB_REF_NAME"
+          elif [[ -n "$INPUT_RELEASE" ]]; then
+            tag="$INPUT_RELEASE"
+          elif [[ "$GITHUB_EVENT_NAME" == push && "$GITHUB_REF_NAME" == "$DEFAULT_BRANCH" ]]; then
+            tag="v$(sed -n 's/^ *versionName = "\(.*\)"$/\1/p' app/build.gradle.kts)"
+            if [[ "$tag" == v ]] || git ls-remote --exit-code --tags origin "refs/tags/$tag" > /dev/null; then
+              tag=""
+            fi
+          fi
+          echo "Release: ${tag:-keins}"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: APK holen
+        if: steps.version.outputs.tag != ''
+        uses: actions/download-artifact@v5
+        with:
+          name: FitPlan-apk
+          path: dist
+
+      - name: Release veröffentlichen
+        if: steps.version.outputs.tag != ''
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          # Fehlt der Tag noch, legt die Action ihn auf dem gebauten Commit an.
+          target_commitish: ${{ github.sha }}
+          name: FitPlan ${{ steps.version.outputs.tag }}
+          body_path: .github/release-notes.md
+          files: dist/FitPlan.apk
