@@ -36,6 +36,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v5
 
       - name: Unit-Tests, Lint und APK
+        env:
+          FITPLAN_KEYSTORE_PASSWORD: ${{ secrets.FITPLAN_KEYSTORE_PASSWORD }}
         run: |
           set -o pipefail
           ./gradlew --continue testDebugUnitTest lintDebug assembleRelease 2>&1 | tee build.log
@@ -266,17 +268,22 @@ jobs:
         env:
           INPUT_RELEASE: ${{ inputs.release }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          HAS_KEY: ${{ secrets.FITPLAN_KEYSTORE_PASSWORD != '' }}
         run: |
           tag=""
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
             tag="$GITHUB_REF_NAME"
           elif [[ -n "$INPUT_RELEASE" ]]; then
             tag="$INPUT_RELEASE"
-          elif [[ "$GITHUB_EVENT_NAME" == push && "$GITHUB_REF_NAME" == "$DEFAULT_BRANCH" ]]; then
+          elif [[ "$GITHUB_REF_NAME" == "$DEFAULT_BRANCH" ]]; then
             tag="v$(sed -n 's/^ *versionName = "\(.*\)"$/\1/p' app/build.gradle.kts)"
             if [[ "$tag" == v ]] || git ls-remote --exit-code --tags origin "refs/tags/$tag" > /dev/null; then
               tag=""
             fi
+          fi
+          if [[ -n "$tag" && "$HAS_KEY" != true ]]; then
+            echo "::warning::Kein Release $tag: Das Secret FITPLAN_KEYSTORE_PASSWORD fehlt (Settings › Secrets and variables › Actions)."
+            tag=""
           fi
           echo "Release: ${tag:-keins}"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
@@ -287,6 +294,20 @@ jobs:
         with:
           name: FitPlan-apk
           path: dist
+
+      # Veröffentlicht wird nur, was mit dem Release-Schlüssel signiert ist – nie ein Debug-Build.
+      - name: Signatur prüfen
+        if: steps.version.outputs.tag != ''
+        env:
+          RELEASE_CERT_SHA256: 3c32d935445b2cb616fc334c10bd809aed0b06f22038e332aed49bacc4ec37d1
+        run: |
+          apksigner="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -n 1)/apksigner"
+          actual=$("$apksigner" verify --print-certs dist/FitPlan.apk | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
+          echo "Zertifikat der APK: $actual"
+          if [[ "$actual" != "$RELEASE_CERT_SHA256" ]]; then
+            echo "::error::Die APK ist nicht mit dem Release-Schlüssel signiert."
+            exit 1
+          fi
 
       - name: Release veröffentlichen
         if: steps.version.outputs.tag != ''

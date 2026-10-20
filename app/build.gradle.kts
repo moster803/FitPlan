@@ -14,20 +14,25 @@ android {
         applicationId = "de.fitplan.app"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 2
-        versionName = "1.0.1"
+        versionCode = 3
+        versionName = "1.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
-        // Fester Schlüssel für selbst installierte APKs: So lassen sich neue Versionen
-        // über die alte installieren, ohne dass Daten verloren gehen.
-        // Für eine Veröffentlichung im Play Store einen eigenen, geheimen Schlüssel verwenden.
-        create("sideload") {
-            storeFile = file("signing/fitplan.jks")
-            storePassword = "fitplan-sideload"
-            keyAlias = "fitplan"
-            keyPassword = "fitplan-sideload"
+        // Release-Schlüssel: Mit ihm sind alle APKs unter „Releases“ signiert, damit sich neue
+        // Versionen über die alte installieren lassen. Die Datei ist verschlüsselt, das Passwort
+        // steht nur im GitHub-Secret FITPLAN_KEYSTORE_PASSWORD. Ohne Passwort (lokal, in Forks)
+        // wird mit dem Debug-Schlüssel signiert.
+        val keystorePassword = providers.environmentVariable("FITPLAN_KEYSTORE_PASSWORD").orNull
+        if (!keystorePassword.isNullOrEmpty()) {
+            create("release") {
+                storeFile = file("signing/fitplan-release.p12")
+                storeType = "PKCS12"
+                storePassword = keystorePassword
+                keyAlias = "fitplan"
+                keyPassword = keystorePassword
+            }
         }
     }
 
@@ -35,12 +40,11 @@ android {
         debug {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
-            signingConfig = signingConfigs.getByName("sideload")
         }
         release {
             // Ohne R8: Das Release-APK enthält denselben Code, den der UI-Test im Emulator prüft.
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("sideload")
+            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",

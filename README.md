@@ -2,6 +2,26 @@
 
 Eine Android-App (optimiert für Samsung-Handys mit One UI) für **tägliche Rückenübungen** und die **Planung von Nahrungsergänzungsmitteln** – mit zuverlässigen Erinnerungen, geführtem Training und Fortschrittsanzeige. Alle Daten bleiben auf dem Handy, es gibt kein Konto und keine Internetverbindung.
 
+## 📲 Installation (Android)
+
+### **[⬇️ FitPlan.apk herunterladen](https://github.com/moster803/FitPlan/releases/latest/download/FitPlan.apk)**
+
+Der Link lädt immer die neueste Version. FitPlan läuft auf Android-Handys ab Android 8 (für iPhones gibt es keine Version).
+
+1. Den Link oben **auf dem Handy** antippen – die Datei `FitPlan.apk` wird heruntergeladen.
+2. Die Datei öffnen: über die Meldung „Download abgeschlossen“ oder in **„Eigene Dateien“ › Downloads**.
+3. Android fragt, ob der Browser **„Unbekannte Apps installieren“** darf: Einstellungen öffnen, erlauben, zurück und **Installieren** tippen.
+4. Falls Google Play Protect warnt: **„Weitere Details“ › „Trotzdem installieren“**. FitPlan kommt nicht aus dem Play Store, deshalb die Warnung.
+5. FitPlan öffnen und der Einrichtung folgen (Name, Training, Uhrzeit, Supplements, Erlaubnisse).
+
+**Updates:** Die neue Version über denselben Link laden und einfach drüber installieren – alle Daten bleiben erhalten. Was sich geändert hat, steht unter [Releases](https://github.com/moster803/FitPlan/releases).
+
+### Damit Erinnerungen zuverlässig ankommen (vor allem auf Samsung)
+- Benachrichtigungen erlauben (fragt die App).
+- Akku-Optimierung für FitPlan ausschalten (Knopf in der App).
+- **Einstellungen › Akku › Hintergrundnutzungslimits › „Nie schlafende Apps“ › FitPlan hinzufügen.**
+- Mit **Einstellungen › Test-Benachrichtigung senden** in FitPlan prüfen, ob alles klappt.
+
 ## Funktionen
 
 ### Training
@@ -39,22 +59,6 @@ Eine Android-App (optimiert für Samsung-Handys mit One UI) für **tägliche Rü
 - Hell-/Dunkelmodus, optional Farben vom Hintergrundbild (Material You).
 - **Backup** als Datei speichern und wiederherstellen (z. B. beim Handywechsel).
 
-## Installation auf dem Samsung-Handy
-
-1. Auf GitHub unter **Actions → Android-Build → letzter erfolgreicher Lauf** das Artefakt **FitPlan-apk** herunterladen und entpacken – oder, falls vorhanden, die `FitPlan.apk` unter **Releases** laden.
-2. Die `FitPlan.apk` auf dem Handy öffnen (z. B. über „Eigene Dateien“).
-3. Beim ersten Mal fragt Android nach der Erlaubnis **„Unbekannte Apps installieren“** für die App, mit der du die Datei öffnest – erlauben.
-4. Falls Google Play Protect warnt: **„Trotzdem installieren“**.
-5. FitPlan öffnen und den Einrichtungsassistenten durchgehen (Plan, Uhrzeit, Supplements, Erlaubnisse).
-
-**Updates:** Einfach die neue `FitPlan.apk` über die alte installieren – alle Daten bleiben erhalten, weil jede Version mit demselben Schlüssel signiert ist.
-
-### Damit Erinnerungen zuverlässig ankommen (Samsung)
-- Benachrichtigungen erlauben (fragt die App).
-- Akku-Optimierung für FitPlan ausschalten (Knopf in der App).
-- **Einstellungen › Akku › Hintergrundnutzungslimits › „Nie schlafende Apps“ › FitPlan hinzufügen.**
-- Mit **Einstellungen › Test-Benachrichtigung senden** prüfen, ob alles klappt.
-
 ## Entwicklung
 
 - Kotlin, Jetpack Compose, Material 3, Navigation Compose, Glance (Widget)
@@ -78,10 +82,10 @@ Bauen und testen:
 
 ```bash
 ./gradlew testDebugUnitTest   # Unit-Tests
-./gradlew assembleRelease     # signiertes APK unter app/build/outputs/apk/release/
+./gradlew assembleRelease     # APK unter app/build/outputs/apk/release/
 ```
 
-Jeder Push baut und testet die App per GitHub Actions (Unit-Tests, Lint, UI-Test im Emulator). Ein Release entsteht, sobald alles grün ist, auf einem dieser Wege:
+Jeder Push baut und testet die App per GitHub Actions (Unit-Tests, Lint, UI-Test im Emulator, Stresstest mit zufälliger Bedienung auf Android 10 und 16). Ein Release entsteht, sobald alles grün ist, auf einem dieser Wege:
 - **automatisch**, wenn auf dem Standard-Branch eine neue `versionName` steht (in `app/build.gradle.kts`, dazu `versionCode` erhöhen und `.github/release-notes.md` anpassen),
 - über **Actions › Android-Build › „Run workflow“** mit der Version im Feld „Als Release veröffentlichen“ (z. B. `v1.1.0`),
 - unter **Releases › „Draft a new release“** mit einem neuen Tag `v*`,
@@ -89,7 +93,9 @@ Jeder Push baut und testet die App per GitHub Actions (Unit-Tests, Lint, UI-Test
 
 Der Workflow hängt dann die `FitPlan.apk` an und übernimmt die Beschreibung aus `.github/release-notes.md`.
 
-> Der mitgelieferte Signaturschlüssel (`app/signing/fitplan.jks`) ist nur für selbst installierte APKs gedacht. Für eine Veröffentlichung im Play Store einen eigenen, geheimen Schlüssel verwenden – und die Berechtigung `USE_EXACT_ALARM` prüfen, die Google nur Wecker- und Kalender-Apps erlaubt.
+**Signatur:** Release-APKs sind mit `app/signing/fitplan-release.p12` signiert. Die Datei ist verschlüsselt, das Passwort steht nur im Repository-Secret `FITPLAN_KEYSTORE_PASSWORD`. Ohne dieses Secret – lokal oder in Forks – signiert Gradle mit dem Debug-Schlüssel, und der Workflow veröffentlicht nichts; vor jedem Release prüft er zusätzlich den Fingerabdruck des Zertifikats. Wer das Passwort verliert, kann keine Updates mehr bauen, die sich über die installierte App legen.
+
+> Für den Play Store wäre außerdem die Berechtigung `USE_EXACT_ALARM` zu prüfen, die Google dort nur Wecker- und Kalender-Apps erlaubt.
 
 ## Wissenschaftliche Grundlage
 
