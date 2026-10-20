@@ -301,9 +301,20 @@ jobs:
         env:
           RELEASE_CERT_SHA256: 3c32d935445b2cb616fc334c10bd809aed0b06f22038e332aed49bacc4ec37d1
         run: |
-          apksigner="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -n 1)/apksigner"
-          actual=$("$apksigner" verify --print-certs dist/FitPlan.apk | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
-          echo "Zertifikat der APK: $actual"
+          set -o pipefail
+          ls -la dist
+          # Neueste Build-Tools-Version mit apksigner verwenden.
+          apksigner=""
+          for dir in $(ls -d "$ANDROID_HOME"/build-tools/* | sort -rV); do
+            if [[ -x "$dir/apksigner" ]]; then
+              apksigner="$dir/apksigner"
+              break
+            fi
+          done
+          echo "apksigner: ${apksigner:-nicht gefunden}"
+          "$apksigner" verify --print-certs dist/FitPlan.apk 2>&1 | tee certs.txt
+          actual=$(grep -oiE 'SHA-256 digest: [0-9a-f]{64}' certs.txt | head -n 1 | awk '{print tolower($3)}' || true)
+          echo "Zertifikat der APK: ${actual:-keins}"
           if [[ "$actual" != "$RELEASE_CERT_SHA256" ]]; then
             echo "::error::Die APK ist nicht mit dem Release-Schlüssel signiert."
             exit 1
