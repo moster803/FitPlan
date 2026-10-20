@@ -182,7 +182,9 @@ jobs:
         run: ./gradlew assembleDebug
 
       # Tausende zufällige Eingaben (Tippen, Wischen, Zurück); Abstürze und ANRs landen im Log.
+      # Der Monkey ist auf 15 Minuten begrenzt, damit die Auswertung auch bei einem hängenden Emulator läuft.
       - name: Zufällige Bedienung (Monkey)
+        timeout-minutes: 30
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
@@ -196,9 +198,10 @@ jobs:
           script: |
             adb install -r -g app/build/outputs/apk/debug/app-debug.apk
             adb logcat -c
-            adb shell monkey -p de.fitplan.app.debug -s 4711 --throttle 60 --pct-syskeys 3 --pct-appswitch 3 --ignore-crashes --ignore-timeouts --ignore-security-exceptions -v 6000 > monkey.log 2>&1 || true
+            timeout 900 adb shell monkey -p de.fitplan.app.debug -s 4711 --throttle 60 --pct-syskeys 3 --pct-appswitch 3 --ignore-crashes --ignore-timeouts --ignore-security-exceptions -v 6000 > monkey.log 2>&1 || true
             adb logcat -d -b crash > crash.log 2>&1 || true
             adb logcat -d -v time > logcat.log 2>&1 || true
+            adb shell dumpsys dropbox --print data_app_anr > anr.log 2>&1 || true
 
       - name: Abstürze auswerten
         if: always()
@@ -213,7 +216,18 @@ jobs:
           fi
           if grep -q "ANR in de.fitplan.app" logcat.log; then
             echo "::error::FitPlan reagierte nicht (ANR)"
-            grep -A 25 "ANR in de.fitplan.app" logcat.log
+            grep -A 8 "ANR in de.fitplan.app" logcat.log
+            # Woran der Hauptthread hing, steht in den ANR-Traces der Dropbox.
+            python3 - <<'PY'
+          text = open("anr.log", errors="replace").read()
+          for entry in text.split("========================================"):
+              if "Process: de.fitplan.app" not in entry:
+                  continue
+              lines = entry.splitlines()
+              print("\n".join(lines[:10]))
+              main = next((i for i, line in enumerate(lines) if line.startswith('"main"')), None)
+              print("\n".join(lines[main:main + 50]) if main is not None else "(kein Stack des Hauptthreads)")
+          PY
             exit 1
           fi
           echo "Keine Abstürze und keine ANRs."
@@ -227,6 +241,7 @@ jobs:
             monkey.log
             crash.log
             logcat.log
+            anr.log
           if-no-files-found: ignore
 
   release:
