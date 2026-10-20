@@ -21,6 +21,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.Lifecycle
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -81,6 +83,24 @@ fun NavHostController.navigateToTab(route: Any) {
     }
 }
 
+/**
+ * Navigation aus einem Bildschirm heraus wirkt nur, solange er der aktive ist. Ein doppeltes Tippen
+ * öffnet so nichts doppelt und „Zurück“ leert nicht versehentlich den ganzen Verlauf (leerer Bildschirm).
+ */
+private val NavBackStackEntry.isActive: Boolean get() = lifecycle.currentState == Lifecycle.State.RESUMED
+
+private fun NavHostController.navigateFrom(entry: NavBackStackEntry, route: Any) {
+    if (entry.isActive) navigate(route)
+}
+
+private fun NavHostController.tabFrom(entry: NavBackStackEntry, route: Any) {
+    if (entry.isActive) navigateToTab(route)
+}
+
+private fun NavHostController.closeFrom(entry: NavBackStackEntry) {
+    if (entry.isActive) popBackStack()
+}
+
 @Composable
 fun FitPlanNavHost(data: AppData, launchRequest: LaunchRequest?, onLaunchHandled: () -> Unit) {
     val nav = rememberNavController()
@@ -122,47 +142,47 @@ fun FitPlanNavHost(data: AppData, launchRequest: LaunchRequest?, onLaunchHandled
             enterTransition = { fadeIn() },
             exitTransition = { fadeOut() },
         ) {
-            composable<HomeRoute> {
+            composable<HomeRoute> { entry ->
                 HomeScreen(
                     data = data,
-                    onStartPlan = { nav.navigate(PlayerRoute(it)) },
-                    onOpenPlans = { nav.navigateToTab(PlansRoute) },
-                    onOpenSupplements = { nav.navigateToTab(SupplementsRoute) },
-                    onAddSupplement = { nav.navigate(SupplementEditorRoute()) },
-                    onOpenSettings = { nav.navigate(SettingsRoute) },
+                    onStartPlan = { nav.navigateFrom(entry, PlayerRoute(it)) },
+                    onOpenPlans = { nav.tabFrom(entry, PlansRoute) },
+                    onOpenSupplements = { nav.tabFrom(entry, SupplementsRoute) },
+                    onAddSupplement = { nav.navigateFrom(entry, SupplementEditorRoute()) },
+                    onOpenSettings = { nav.navigateFrom(entry, SettingsRoute) },
                 )
             }
-            composable<PlansRoute> {
+            composable<PlansRoute> { entry ->
                 PlansScreen(
                     data = data,
-                    onStartPlan = { nav.navigate(PlayerRoute(it)) },
-                    onEditPlan = { nav.navigate(PlanEditorRoute(planId = it)) },
-                    onNewPlan = { nav.navigate(PlanEditorRoute(templateKey = it)) },
-                    onOpenLibrary = { nav.navigate(ExerciseLibraryRoute()) },
-                    onOpenEvidence = { nav.navigate(EvidenceRoute) },
+                    onStartPlan = { nav.navigateFrom(entry, PlayerRoute(it)) },
+                    onEditPlan = { nav.navigateFrom(entry, PlanEditorRoute(planId = it)) },
+                    onNewPlan = { nav.navigateFrom(entry, PlanEditorRoute(templateKey = it)) },
+                    onOpenLibrary = { nav.navigateFrom(entry, ExerciseLibraryRoute()) },
+                    onOpenEvidence = { nav.navigateFrom(entry, EvidenceRoute) },
                 )
             }
-            composable<SupplementsRoute> {
+            composable<SupplementsRoute> { entry ->
                 SupplementsScreen(
                     data = data,
-                    onEdit = { nav.navigate(SupplementEditorRoute(supplementId = it)) },
-                    onAdd = { nav.navigate(SupplementEditorRoute(templateKey = it)) },
+                    onEdit = { nav.navigateFrom(entry, SupplementEditorRoute(supplementId = it)) },
+                    onAdd = { nav.navigateFrom(entry, SupplementEditorRoute(templateKey = it)) },
                 )
             }
             composable<HistoryRoute> { HistoryScreen(data = data) }
-            composable<SettingsRoute> { SettingsScreen(data = data, onBack = { nav.popBackStack() }) }
+            composable<SettingsRoute> { entry -> SettingsScreen(data = data, onBack = { nav.closeFrom(entry) }) }
             composable<ExerciseLibraryRoute> { entry ->
                 ExerciseLibraryScreen(
                     data = data,
                     initialFilter = entry.toRoute<ExerciseLibraryRoute>().filter,
-                    onBack = { nav.popBackStack() },
-                    onOpenEvidence = { nav.navigate(EvidenceRoute) },
+                    onBack = { nav.closeFrom(entry) },
+                    onOpenEvidence = { nav.navigateFrom(entry, EvidenceRoute) },
                 )
             }
-            composable<EvidenceRoute> {
+            composable<EvidenceRoute> { entry ->
                 EvidenceScreen(
-                    onBack = { nav.popBackStack() },
-                    onShowExercises = { approach -> nav.navigate(ExerciseLibraryRoute(filter = approach.name)) },
+                    onBack = { nav.closeFrom(entry) },
+                    onShowExercises = { approach -> nav.navigateFrom(entry, ExerciseLibraryRoute(filter = approach.name)) },
                 )
             }
             composable<PlanEditorRoute> { entry ->
@@ -171,11 +191,11 @@ fun FitPlanNavHost(data: AppData, launchRequest: LaunchRequest?, onLaunchHandled
                     data = data,
                     planId = route.planId,
                     templateKey = route.templateKey,
-                    onClose = { nav.popBackStack() },
+                    onClose = { nav.closeFrom(entry) },
                 )
             }
             composable<PlayerRoute> { entry ->
-                PlayerScreen(planId = entry.toRoute<PlayerRoute>().planId, onClose = { nav.popBackStack() })
+                PlayerScreen(planId = entry.toRoute<PlayerRoute>().planId, onClose = { nav.closeFrom(entry) })
             }
             composable<SupplementEditorRoute> { entry ->
                 val route = entry.toRoute<SupplementEditorRoute>()
@@ -183,7 +203,7 @@ fun FitPlanNavHost(data: AppData, launchRequest: LaunchRequest?, onLaunchHandled
                     data = data,
                     supplementId = route.supplementId,
                     templateKey = route.templateKey,
-                    onClose = { nav.popBackStack() },
+                    onClose = { nav.closeFrom(entry) },
                 )
             }
         }

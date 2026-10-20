@@ -1,6 +1,7 @@
 package de.fitplan.app
 
 import android.app.Application
+import android.util.Log
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -23,7 +24,9 @@ class FitPlanApp : Application() {
                 .distinctUntilChanged()
                 .debounce(300)
                 .collect { data ->
-                    container.scheduler.reschedule(data)
+                    // Ein Fehler darf die Sammlung nicht beenden, sonst würden spätere Änderungen nicht mehr geplant.
+                    runCatching { container.scheduler.reschedule(data) }
+                        .onFailure { Log.e(AppContainer.TAG, "Erinnerungen konnten nicht geplant werden", it) }
                     container.widgets.updateAll()
                 }
         }

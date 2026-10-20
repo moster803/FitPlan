@@ -204,6 +204,8 @@ jobs:
         if: always()
         run: |
           grep -E "Events injected|Monkey finished|CRASH|NOT RESPONDING" monkey.log || tail -n 20 monkey.log || true
+          # Abgefangene Fehler aus Hintergrundaufgaben brechen den Test nicht ab, sollen aber sichtbar sein.
+          grep -A 12 "E/FitPlan" logcat.log || true
           if grep -q "de.fitplan.app" crash.log; then
             echo "::error::FitPlan ist während des Stresstests abgestürzt"
             cat crash.log

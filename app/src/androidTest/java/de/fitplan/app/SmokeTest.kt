@@ -21,6 +21,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTouchInput
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -213,13 +214,32 @@ class SmokeTest {
         waitForText("Rückengefühl")
         screenshot("18_verlauf")
 
-        // Einstellungen
+        // Einstellungen: Schalter umlegen, Design wechseln, Namen speichern
         tab("Heute").performClick()
         waitForText("Training heute")
         compose.onNodeWithContentDescription("Einstellungen").performClick()
         waitForText("Erinnerungen")
         screenshot("19_einstellungen")
-        back()
+        listOf("Töne", "Vibration", "Sprachansagen", "Supplement-Erinnerungen", "Vorrats-Warnungen").forEach { label ->
+            scrollTo(label)
+            compose.onNodeWithText(label).performClick()
+        }
+        scrollTo("Dunkel")
+        listOf("Dunkel", "Hell", "System").forEach { compose.onNodeWithText(it).performClick() }
+        scrollTo("Dein Name")
+        compose.onNodeWithText("Dein Name").performClick()
+        compose.onNodeWithText("Speichern").performClick()
+        compose.waitUntil(5_000) {
+            val settings = runBlocking { app.repository.current() }.settings
+            settings.sound && !settings.vibration && settings.voice && !settings.supplementReminders && !settings.lowStockAlerts
+        }
+        // Doppeltes Tippen auf „Zurück“ geht nur einen Schritt zurück, statt einen leeren Bildschirm zu hinterlassen.
+        compose.onNodeWithContentDescription("Zurück").performTouchInput {
+            click()
+            advanceEventTime(60)
+            click()
+        }
+        waitForText("Training heute")
 
         // Dunkles Design
         runBlocking { app.repository.updateSettings { it.copy(themeMode = ThemeMode.DARK) } }

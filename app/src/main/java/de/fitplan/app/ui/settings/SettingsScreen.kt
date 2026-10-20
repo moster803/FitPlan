@@ -1,5 +1,6 @@
 package de.fitplan.app.ui.settings
 
+import android.content.ActivityNotFoundException
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -62,6 +63,7 @@ import de.fitplan.app.ui.LocalContainer
 import de.fitplan.app.ui.common.ConfirmDialog
 import de.fitplan.app.ui.common.ReminderPermissions
 import de.fitplan.app.ui.common.SectionHeader
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -237,13 +239,17 @@ fun SettingsScreen(data: AppData, onBack: () -> Unit) {
                         icon = Icons.Rounded.Upload,
                         title = stringResource(R.string.backup_export),
                         subtitle = stringResource(R.string.backup_export_text),
-                        onClick = { exportLauncher.launch("fitplan-backup-${LocalDate.now()}.json") },
+                        onClick = {
+                            launchPicker(scope, snackbar, messageFailed) { exportLauncher.launch("fitplan-backup-${LocalDate.now()}.json") }
+                        },
                     )
                     ActionRow(
                         icon = Icons.Rounded.Download,
                         title = stringResource(R.string.backup_import),
                         subtitle = stringResource(R.string.backup_import_text),
-                        onClick = { importLauncher.launch(arrayOf("application/json", "text/plain", "*/*")) },
+                        onClick = {
+                            launchPicker(scope, snackbar, messageFailed) { importLauncher.launch(arrayOf("application/json", "text/plain", "*/*")) }
+                        },
                     )
                     ActionRow(
                         icon = Icons.Rounded.RestartAlt,
@@ -317,6 +323,15 @@ fun SettingsScreen(data: AppData, onBack: () -> Unit) {
             },
             onDismiss = { confirmReset = false },
         )
+    }
+}
+
+/** Öffnet die Dateiauswahl; fehlt sie auf dem Gerät, gibt es einen Hinweis statt eines Absturzes. */
+private fun launchPicker(scope: CoroutineScope, snackbar: SnackbarHostState, message: String, launch: () -> Unit) {
+    try {
+        launch()
+    } catch (_: ActivityNotFoundException) {
+        scope.launch { snackbar.showSnackbar(message) }
     }
 }
 
