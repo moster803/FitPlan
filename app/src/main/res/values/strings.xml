@@ -155,6 +155,7 @@
         <item quantity="one">%d Tag in Folge</item>
         <item quantity="other">%d Tage in Folge</item>
     </plurals>
+    <string name="streak_none">Neue Serie</string>
     <string name="streak_start">Heute ist ein guter Tag, um deine Serie zu starten.</string>
     <string name="streak_keep_going">Halte deine Serie – heute fehlt noch dein Training.</string>
     <string name="streak_today_done">Stark! Heute schon erledigt 💪</string>

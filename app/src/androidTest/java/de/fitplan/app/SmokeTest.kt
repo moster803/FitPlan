@@ -20,7 +20,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
-import androidx.test.espresso.Espresso
+import androidx.core.app.NotificationManagerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
@@ -78,8 +78,7 @@ class SmokeTest {
         compose.onNode(hasText(label) and SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab))
 
     private fun back() {
-        // Echte Zurück-Taste, damit auch Bottom Sheets in ihrem eigenen Fenster reagieren.
-        Espresso.pressBack()
+        compose.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
         compose.waitForIdle()
     }
 
@@ -126,6 +125,8 @@ class SmokeTest {
         val today = LocalDate.now()
         app.notifications.showSupplements(TimeSlot.MORNING, data.dueSupplements(today, TimeSlot.MORNING), today)
         app.notifications.showTest()
+        // Heads-up-Benachrichtigungen wieder entfernen, damit sie den weiteren Test nicht überdecken.
+        NotificationManagerCompat.from(compose.activity).cancelAll()
 
         scrollTo("Vitamin D3")
         compose.onNodeWithText("Vitamin D3").performClick()
@@ -168,7 +169,12 @@ class SmokeTest {
         compose.onNodeWithText("Neuer Plan").performClick()
         waitForText("Neuen Plan erstellen")
         screenshot("14_vorlagen")
+        compose.onNodeWithText("Büro-Pause").performClick()
+        waitForText("Neuer Plan")
+        screenshot("14b_neuer_plan")
         back()
+        waitForText("Änderungen verwerfen?")
+        compose.onNodeWithText("Verwerfen").performClick()
         compose.onNodeWithText("Übungsbibliothek").performClick()
         waitForText("Katze-Kuh")
         compose.onNodeWithText("Katze-Kuh").performClick()

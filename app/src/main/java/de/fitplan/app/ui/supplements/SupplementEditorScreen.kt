@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Inventory2
@@ -49,6 +50,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -210,7 +212,9 @@ fun SupplementEditorScreen(data: AppData, supplementId: String?, templateKey: St
                             onClick = { vm.update { it.copy(color = index) } },
                             background = FitTheme.accent(index).strong,
                             size = 32.dp,
-                        )
+                        ) {
+                            if (s.color == index) Icon(Icons.Rounded.Check, contentDescription = null, tint = Color.White)
+                        }
                     }
                 }
             }

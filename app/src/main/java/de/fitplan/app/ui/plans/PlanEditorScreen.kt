@@ -27,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ArrowDownward
 import androidx.compose.material.icons.rounded.ArrowUpward
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Notifications
@@ -61,6 +62,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -175,7 +177,9 @@ fun PlanEditorScreen(data: AppData, planId: String?, templateKey: String?, onClo
                             onClick = { vm.update { it.copy(color = index) } },
                             background = FitTheme.accent(index).strong,
                             size = 36.dp,
-                        )
+                        ) {
+                            if (plan.color == index) Icon(Icons.Rounded.Check, contentDescription = null, tint = Color.White)
+                        }
                     }
                 }
             }

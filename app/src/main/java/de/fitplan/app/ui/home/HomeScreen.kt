@@ -262,7 +262,7 @@ private fun StreakCard(streak: Int, best: Int, todayDone: Boolean, week: List<Pa
                 Spacer(Modifier.width(16.dp))
                 Column(Modifier.weight(1f)) {
                     Text(
-                        text = pluralStringResource(R.plurals.streak_days, streak, streak),
+                        text = if (streak == 0) stringResource(R.string.streak_none) else pluralStringResource(R.plurals.streak_days, streak, streak),
                         style = MaterialTheme.typography.headlineMedium,
                     )
                     Text(
