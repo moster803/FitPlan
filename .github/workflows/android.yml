@@ -199,8 +199,10 @@ jobs:
           ram-size: 3072M
           disk-size: 4096M
           disable-animations: true
+          # Direkt nach dem Start ist die Paketverwaltung manchmal noch nicht bereit und „adb install“ hängt – daher warten, begrenzen und einmal wiederholen.
           script: |
-            adb install -r -g app/build/outputs/apk/debug/app-debug.apk
+            timeout 180 sh -c 'until adb shell pm path android > /dev/null 2>&1; do sleep 3; done' || true
+            timeout 300 adb install -r -g app/build/outputs/apk/debug/app-debug.apk || (sleep 20 && timeout 300 adb install -r -g app/build/outputs/apk/debug/app-debug.apk)
             adb logcat -c
             timeout 900 adb shell monkey -p de.fitplan.app.debug -s 4711 --throttle 60 --pct-syskeys 3 --pct-appswitch 3 --ignore-crashes --ignore-timeouts --ignore-security-exceptions -v 6000 > monkey.log 2>&1 || true
             adb logcat -d -b crash > crash.log 2>&1 || true
@@ -210,6 +212,10 @@ jobs:
       - name: Abstürze auswerten
         if: always()
         run: |
+          if ! grep -qE ":Monkey:|:Sending|Events injected" monkey.log 2>/dev/null; then
+            echo "::error::Der Stresstest ist nicht gelaufen (Emulator oder Installation hing) – es gibt kein Ergebnis."
+            exit 1
+          fi
           grep -E "Events injected|Monkey finished|CRASH|NOT RESPONDING" monkey.log || tail -n 20 monkey.log || true
           # Abgefangene Fehler aus Hintergrundaufgaben brechen den Test nicht ab, sollen aber sichtbar sein.
           grep -A 12 "E/FitPlan" logcat.log || true
