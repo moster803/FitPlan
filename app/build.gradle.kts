@@ -63,9 +63,6 @@ android {
     }
 
     lint {
-        // Befunde direkt im Build-Log ausgeben, damit CI-Fehler ohne Bericht-Download lesbar sind.
-        textReport = true
-        textOutput = file("stdout")
         checkReleaseBuilds = false
     }
 
